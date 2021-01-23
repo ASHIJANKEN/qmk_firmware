@@ -23,6 +23,7 @@
 #define MASTER_LEFT
 // #define MASTER_RIGHT
 // #define EE_HANDS
+#define SSD1306OLED
 #define IS_LEFT_HAND false
 #define BMP_DEFAULT_MODE SPLIT_SLAVE
 
