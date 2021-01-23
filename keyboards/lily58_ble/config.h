@@ -78,8 +78,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KEYMAP_PRIOR_LOCALE 0
 #define KEYMAP_ASCII 0
 
-/* COL2ROW, ROW2COL*/
-#define DIODE_DIRECTION COL2ROW
+/* OLED */
+// #define USE_I2C
+#define OLED_DISABLE_TIMEOUT
 
 #define RGBLIGHT_SPLIT
 #define RGB_DI_PIN 255
