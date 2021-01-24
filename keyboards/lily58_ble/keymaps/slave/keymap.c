@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include <stdio.h>
 #ifdef CONSOLE_ENABLE
   #include <print.h>
 #endif
@@ -18,6 +19,7 @@
 
 extern uint8_t is_master;
 
+// https://qiita.com/m47ch4n/items/1a546f7b1295e0e24a58
 #define SHIFT_RESTORE(STR) (shift_pressed ? SEND_STRING(STR SS_DOWN(X_LSHIFT)) : SEND_STRING(STR SS_UP(X_LSHIFT)))
 #define KEY(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define KEY_SHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
@@ -34,7 +36,7 @@ extern uint8_t is_master;
 #define WINDOWS_MODE true
 #define MAC_MODE false
 
-void show_mode(void);
+void show_info_oled(void);
 
 enum layer_number {
   _QWERTY = 0,
@@ -77,6 +79,15 @@ enum custom_keycodes {
   CS_7,
   CS_8,
   CS_9,
+  BT_ID0,
+  BT_ID1,
+  BT_ID2,
+  BT_ID3,
+  BT_ID4,
+  BT_ID5,
+  BT_ID6,
+  BT_ID7,
+  INFO,
   CIRC,
   AT,
   LBRC,
@@ -97,7 +108,7 @@ enum custom_keycodes {
   UNDS,
   MINS,
   SCLN,
-  EXLM,
+  BIKKURI, // Name of "EXLM" causes a bug of conflicting to EX().
   HASH,
   DLR,
   PERC,
@@ -128,6 +139,15 @@ const key_string_map_t custom_keys_user = {
       "CS_7\0"
       "CS_8\0"
       "CS_9\0"
+      "BT_ID0\0"
+      "BT_ID1\0"
+      "BT_ID2\0"
+      "BT_ID3\0"
+      "BT_ID4\0"
+      "BT_ID5\0"
+      "BT_ID6\0"
+      "BT_ID7\0"
+      "INFO\0"
       "CIRC\0"
       "AT\0"
       "LBRC\0"
@@ -148,7 +168,7 @@ const key_string_map_t custom_keys_user = {
       "UNDS\0"
       "MINS\0"
       "SCLN\0"
-      "EXLM\0"
+      "BIKKURI\0"
       "HASH\0"
       "DLR\0"
       "PERC\0"
@@ -186,11 +206,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                   `----------------------------'           '------''--------------------'
  */
  [_QWERTY] = LAYOUT( \
-    KC_ESC,   CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                CS_6,    CS_7,    CS_8,    CS_9,    CS_0, KC_BSPC, \
-    KC_TAB,   KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    MINS, \
-  KC_LCTRL,   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                KC_H,    KC_J,    KC_K,    KC_L,    SCLN,    QUOT, \
-     SHIFT,   KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,  LPRN,  RPRN,  KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,   SHIFT, \
-                         KC_LALT, KC_LGUI, MO(_LOWER), KC_SPC,  KC_ENT, MO(_RAISE), KC_RGUI, KC_RALT \
+   KC_ESC,   CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                CS_6,    CS_7,    CS_8,    CS_9,    CS_0, KC_BSPC, \
+   KC_TAB,   KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    MINS, \
+  KC_CAPS,   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                KC_H,    KC_J,    KC_K,    KC_L,    SCLN,    QUOT, \
+    SHIFT,   KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,  LPRN,  RPRN,  KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,   SHIFT, \
+                        KC_LALT, KC_LGUI, MO(_LOWER), KC_SPC,  KC_ENT, MO(_RAISE), KC_RGUI, KC_RALT \
 ),
 
 /* LOWER
@@ -210,7 +230,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_LOWER] = LAYOUT( \
   _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,             XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,               KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, \
-     TILD,    EXLM,      AT,    HASH,     DLR,    PERC,                CIRC,    AMPR,    ASTR,    LPRN,    RPRN,    TILD, \
+     TILD, BIKKURI,      AT,    HASH,     DLR,    PERC,                CIRC,    AMPR,    ASTR,    LPRN,    RPRN,    TILD, \
   _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, LBRC, RBRC, XXXXXXX, UNDS, PLUS, LCBR, RCBR, PIPE, \
                           _______, _______, _______, _______, _______,  _______, _______, _______\
 ),
@@ -252,11 +272,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                   `----------------------------'           '------''--------------------'
  */
  [_QWERTY_WIN] = LAYOUT( \
-    KC_ESC,   CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                      CS_6,    CS_7,    CS_8,    CS_9,    CS_0, KC_BSPC, \
-    KC_TAB,   JP_Q,    JP_W,    JP_E,    JP_R,    JP_T,                      JP_Y,    JP_U,    JP_I,    JP_O,    JP_P,    MINS, \
-  KC_LCTRL,   JP_A,    JP_S,    JP_D,    JP_F,    JP_G,                      JP_H,    JP_J,    JP_K,    JP_L,    SCLN,    QUOT, \
-     SHIFT,   JP_Z,    JP_X,    JP_C,    JP_V,    JP_B, KC_MHEN, KC_HENK,    JP_N,    JP_M, KC_COMM,  KC_DOT, KC_SLSH,   SHIFT, \
-       KC_LALT, MO(_LOWER_WIN), LT(_LOWER_WIN, KC_MHEN), KC_SPC, KC_ENT, LT(_RAISE_WIN, KC_HENK), MO(_RAISE_WIN), KC_RALT \
+   KC_ESC,   CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                      CS_6,    CS_7,    CS_8,    CS_9,    CS_0, KC_BSPC, \
+   KC_TAB,   JP_Q,    JP_W,    JP_E,    JP_R,    JP_T,                      JP_Y,    JP_U,    JP_I,    JP_O,    JP_P,    MINS, \
+  KC_LCTL,   JP_A,    JP_S,    JP_D,    JP_F,    JP_G,                      JP_H,    JP_J,    JP_K,    JP_L,    SCLN,    QUOT, \
+    SHIFT,   JP_Z,    JP_X,    JP_C,    JP_V,    JP_B, KC_MHEN, KC_HENK,    JP_N,    JP_M, KC_COMM,  KC_DOT, KC_SLSH,   SHIFT, \
+      KC_LALT, MO(_LOWER_WIN), LT(_LOWER_WIN, KC_MHEN), KC_SPC, KC_ENT, LT(_RAISE_WIN, KC_HENK), MO(_RAISE_WIN), KC_RALT \
 ),
 
   /* LOWER_WIN
@@ -276,7 +296,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_LOWER_WIN] = LAYOUT( \
     _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,             XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
       KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,               KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, \
-        GRV,    EXLM,      AT,    HASH,     DLR,    PERC,             KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX,    TILD, \
+        GRV, BIKKURI,      AT,    HASH,     DLR,    PERC,             KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX,    TILD, \
     _______,    CIRC,    AMPR,    ASTR,    LPRN,    RPRN, LBRC, RBRC, XXXXXXX,    UNDS,    PLUS,    LCBR,    RCBR, _______, \
                             _______, _______, _______, _______, _______, _______, _______, _______\
   ),
@@ -305,21 +325,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   /* ADJUST
    * ,-----------------------------------------.                    ,-----------------------------------------.
-   * |      |      |      |      |      |      |                    |      |      |      |      |      |      |
+   * |      |BT_ID1|BT_ID2|BT_ID3|BT_ID4|BT_ID5|                    |BT_ID6|BT_ID7|      |      |      |      |
    * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
    * |      |      | WIN  |      |      |      |                    |      |  US  |      |      |      |      |
    * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
    * |      |      |      |      |      |      |-------.    ,-------|      | JIS  |      |      |      |      |
    * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
-   * |      |      |      |      |      |      |-------|    |-------|      | MAC  |      |      |      |      |
+   * |      |      |      |      |     |BATT_LV|-------|    |-------|      | MAC  |      |      |      |      |
    * `-----------------------------------------/       /     \      \-----------------------------------------'
    *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
    *                   |      |      |      |/       /         \      \ |      |      |      |
    *                   `----------------------------'           '------''--------------------'
    */
   [_ADJUST] = LAYOUT( \
-  XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-  XXXXXXX, XXXXXXX, QWERTY_WIN, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,      US, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+  XXXXXXX,  BT_ID1,     BT_ID2,  BT_ID3,  BT_ID4,  BT_ID5,                    BT_ID6,  BT_ID7, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+  XXXXXXX, XXXXXXX, QWERTY_WIN, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,      US,    INFO, XXXXXXX, XXXXXXX, XXXXXXX, \
   XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,     JIS, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
   XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
                                 _______, _______, _______, _______, _______,  _______, _______, _______ \
@@ -361,7 +381,7 @@ void keyboard_post_init_user(void) {
   kb_config.raw = eeconfig_read_user();
   kb_layout = kb_config.layout;
   os_mode = layer_state_to_num(eeconfig_read_default_layer()) == _QWERTY ? MAC_MODE : WINDOWS_MODE;
-  show_mode();
+  show_info_oled();
 }
 
 // Set keyboard layout information to eeprom.
@@ -373,19 +393,23 @@ void set_default_kb_layout(bool layout) {
 
 #ifdef OLED_DRIVER_ENABLE
 // Display information on OLEDs.
-void show_mode() {
+void show_info_oled() {
 #ifdef CONSOLE_ENABLE
-  uprintf("show_mode\n");
+  uprintf("show_info_oled\n");
 #endif
   if (is_keyboard_master()) {
     oled_on();
     char os[24] = "OS: ";
-    strcat(os, os_mode ? "WINDOWS\n" : "MAC\n");
+    strcat(os, os_mode ? "WINDOWS" : "MAC");
     char layout[24] = "LAYOUT: ";
-    strcat(layout, kb_layout ? "JIS\n" : "US\n");
+    strcat(layout, kb_layout ? "JIS" : "US");
+    char batt[24];
+    // The code is based on tmk_core/protocol/nrf/bmp.c
+    sprintf(batt, "BATTERY: %4dmV", BMPAPI->app.get_vcc_mv());
     oled_clear();
     oled_write_ln(os, false);
     oled_write_ln(layout, false);
+    oled_write_ln(batt, false);
   }
 }
 #endif // OLED_DRIVER_ENABLE
@@ -459,7 +483,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif // OLED_DRIVER_ENABLE
   }
 
-  bool change_keyboard_mode = false;
   switch (keycode) {
     CASE_US(CS_0, KEY(0), SHIFT_DU(KEY_SHIFT(9), KEY(0)));
     CASE_US(CS_1, KEY(1), KEY(1));
@@ -473,7 +496,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     CASE_US(CS_9, KEY(9), SHIFT_DU(KEY_SHIFT(8), KEY(9)));
     CASE_US(DEL, KEY(DELETE), KEY_UPSHIFT(BSPACE));
     CASE_US(TILD, KEY_SHIFT(GRAVE), KEY_SHIFT(EQUAL));
-    CASE_US(EXLM, KEY_SHIFT(1), KEY_SHIFT(1));
+    CASE_US(BIKKURI, KEY_SHIFT(1), KEY_SHIFT(1));
     CASE_US(AT, KEY_SHIFT(2), KEY(LBRACKET));
     CASE_US(HASH, KEY_SHIFT(3), KEY_SHIFT(3));
     CASE_US(DLR, KEY_SHIFT(4), KEY_SHIFT(4));
@@ -496,34 +519,49 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     CASE_US(PLUS, KEY_SHIFT(EQUAL), KEY_SHIFT(SCOLON));
     CASE_US(SCLN, KEY(SCOLON), SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
     CASE_US(QUOT, KEY(QUOTE), SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
+    case BT_ID0 ... BT_ID7:
+      // The code is based on tmk_core/protocol/nrf/bmp.c
+      if (record->event.pressed) {
+        if (shift_pressed) {
+          BMPAPI->ble.delete_bond(keycode - BT_ID0);
+        } else {
+          BMPAPI->ble.advertise(keycode - BT_ID0);
+        }
+      }
+      return false;
+    case INFO:
+      if (record->event.pressed) {
+        show_info_oled();
+      }
+      return false;
     case JIS:
       if (record->event.pressed) {
         kb_layout = JIS_LAYOUT;
         set_default_kb_layout(kb_layout);
+        show_info_oled();
       }
-      change_keyboard_mode = true;
-      break;
+      return false;
     case US:
       if (record->event.pressed) {
         kb_layout = US_LAYOUT;
         set_default_kb_layout(kb_layout);
+        show_info_oled();
       }
-      change_keyboard_mode = true;
-      break;
+      return false;
     case QWERTY:
       if (record->event.pressed) {
         os_mode = MAC_MODE;
         set_single_persistent_default_layer(_QWERTY);
+        show_info_oled();
       }
-      change_keyboard_mode = true;
-      break;
+      return false;
     case QWERTY_WIN:
       if (record->event.pressed) {
         os_mode = WINDOWS_MODE;
         set_single_persistent_default_layer(_QWERTY_WIN);
+        show_info_oled();
       }
-      change_keyboard_mode = true;
-      break;
+      return false;
     case SHIFT:
       if (record->event.pressed) {
         SEND_STRING(SS_DOWN(X_LSHIFT));
@@ -535,12 +573,5 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
       break;
   }
-
-  // Normaly, oleds are off. Turn on only when a user change keyboard-mode.
-  if (change_keyboard_mode == true) {
-    show_mode();
-    return false;
-  }
-
   return true;
 }
