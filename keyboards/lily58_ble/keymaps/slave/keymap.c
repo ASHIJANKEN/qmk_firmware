@@ -3,16 +3,8 @@
 #ifdef CONSOLE_ENABLE
   #include <print.h>
 #endif
-#ifdef PROTOCOL_LUFA
-  #include "lufa.h"
-  #include "split_util.h"
-#endif
-#ifdef SSD1306OLED
-  // #include "ssd1306.h"
-  // #include "i2c.h"
-#endif
 #include <string.h>
-#include "keymap_jp.h"  // qmk_firmware_bmp/quantum/keymap_extras/keymap_jp.h
+#include "keymap_jp.h" // qmk_firmware_bmp/quantum/keymap_extras/keymap_jp.h
 #include "bmp.h"
 #include "bmp_custom_keycode.h"
 #include "keycode_str_converter.h"
@@ -47,16 +39,6 @@ enum layer_number {
   _RAISE_WIN,
   _ADJUST,
 };
-
-// char layer_name[7][12] = {
-//   "QWERTY",
-//   "LOWER",
-//   "RAISE",
-//   "QWERTY_WIN",
-//   "LOWER_WIN",
-//   "RAISE_WIN",
-//   "ADJUST",
-// };
 
 enum custom_keycodes {
   QWERTY = BMP_SAFE_RANGE,
@@ -116,65 +98,64 @@ enum custom_keycodes {
 };
 
 const key_string_map_t custom_keys_user = {
-    .start_kc = QWERTY,
-    .end_kc = DEL,
-    .key_strings =
-      "QWERTY\0"
-      "QWERTY_WIN\0"
-      "JIS\0"
-      "US\0"
-      "UBUNTU\0"
-      "MAC\0"
-      "SHIFT\0"
-      "LOWER\0"
-      "RAISE\0"
-      "ADJUST\0"
-      "CS_0\0"
-      "CS_1\0"
-      "CS_2\0"
-      "CS_3\0"
-      "CS_4\0"
-      "CS_5\0"
-      "CS_6\0"
-      "CS_7\0"
-      "CS_8\0"
-      "CS_9\0"
-      "BT_ID0\0"
-      "BT_ID1\0"
-      "BT_ID2\0"
-      "BT_ID3\0"
-      "BT_ID4\0"
-      "BT_ID5\0"
-      "BT_ID6\0"
-      "BT_ID7\0"
-      "INFO\0"
-      "CIRC\0"
-      "AT\0"
-      "LBRC\0"
-      "RBRC\0"
-      "BSLS\0"
-      "AMPR\0"
-      "QUOT\0"
-      "LPRN\0"
-      "RPRN\0"
-      "EQL\0"
-      "TILD\0"
-      "PIPE\0"
-      "GRV\0"
-      "LCBR\0"
-      "PLUS\0"
-      "ASTR\0"
-      "RCBR\0"
-      "UNDS\0"
-      "MINS\0"
-      "SCLN\0"
-      "BIKKURI\0"
-      "HASH\0"
-      "DLR\0"
-      "PERC\0"
-      "DEL\0"
+  .start_kc = QWERTY,
+  .end_kc = DEL,
+  .key_strings =
+    "QWERTY\0"
+    "QWERTY_WIN\0"
+    "JIS\0"
+    "US\0"
+    "UBUNTU\0"
+    "MAC\0"
+    "SHIFT\0"
+    "LOWER\0"
+    "RAISE\0"
+    "ADJUST\0"
+    "CS_0\0"
+    "CS_1\0"
+    "CS_2\0"
+    "CS_3\0"
+    "CS_4\0"
+    "CS_5\0"
+    "CS_6\0"
+    "CS_7\0"
+    "CS_8\0"
+    "CS_9\0"
+    "BT_ID0\0"
+    "BT_ID1\0"
+    "BT_ID2\0"
+    "BT_ID3\0"
+    "BT_ID4\0"
+    "BT_ID5\0"
+    "BT_ID6\0"
+    "BT_ID7\0"
+    "INFO\0"
+    "CIRC\0"
+    "AT\0"
+    "LBRC\0"
+    "RBRC\0"
+    "BSLS\0"
+    "AMPR\0"
+    "QUOT\0"
+    "LPRN\0"
+    "RPRN\0"
+    "EQL\0"
+    "TILD\0"
+    "PIPE\0"
+    "GRV\0"
+    "LCBR\0"
+    "PLUS\0"
+    "ASTR\0"
+    "RCBR\0"
+    "UNDS\0"
+    "MINS\0"
+    "SCLN\0"
+    "BIKKURI\0"
+    "HASH\0"
+    "DLR\0"
+    "PERC\0"
+    "DEL\0"
 };
-
 
 typedef union {
   uint8_t raw;
@@ -327,7 +308,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * ,-----------------------------------------.                    ,-----------------------------------------.
    * |      |BT_ID1|BT_ID2|BT_ID3|BT_ID4|BT_ID5|                    |BT_ID6|BT_ID7|      |      |      |      |
    * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-   * |      |      | WIN  |      |      |      |                    |      |  US  |      |      |      |      |
+   * |      |      | WIN  |      |      |      |                    |      |  US  | INFO |      |      |      |
    * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
    * |      |      |      |      |      |      |-------.    ,-------|      | JIS  |      |      |      |      |
    * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
@@ -414,59 +395,6 @@ void show_info_oled() {
 }
 #endif // OLED_DRIVER_ENABLE
 
-
-// //SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
-// #ifdef SSD1306OLED
-
-// // When add source files to SRC in rules.mk, you can use functions.
-// // const char *read_layer_state(void);
-// // const char *read_logo(void);
-// // void set_keylog(uint16_t keycode, keyrecord_t *record);
-// // const char *read_keylog(void);
-// // const char *read_keylogs(void);
-
-// // const char *read_mode_icon(bool swap);
-// // const char *read_host_led_state(void);
-// // void set_timelog(void);
-// // const char *read_timelog(void);
-
-// void matrix_scan_user(void) {
-//    iota_gfx_task();
-// }
-
-// void matrix_render_user(struct CharacterMatrix *matrix) {
-//   if (is_master) {
-//     char os[24] = "OS: ";
-//     strcat(os, os_mode ? "WINDOWS\n" : "MAC\n");
-//     char layout[24] = "LAYOUT: ";
-//     strcat(layout, kb_layout ? "JIS\n" : "US\n");
-//     matrix_write_ln(matrix, os);
-//     matrix_write_ln(matrix, layout);
-//     // If you want to change the display of OLED, you need to change here
-//     // matrix_write_ln(matrix, read_layer_state());
-//     // matrix_write_ln(matrix, read_keylog());
-//     // matrix_write_ln(matrix, read_keylogs());
-//     //matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
-//     //matrix_write_ln(matrix, read_host_led_state());
-//     //matrix_write_ln(matrix, read_timelog());
-//   }
-// }
-
-// void matrix_update(struct CharacterMatrix *dest, const struct CharacterMatrix *source) {
-//   if (memcmp(dest->display, source->display, sizeof(dest->display))) {
-//     memcpy(dest->display, source->display, sizeof(dest->display));
-//     dest->dirty = true;
-//   }
-// }
-
-// void iota_gfx_task_user(void) {
-//   struct CharacterMatrix matrix;
-//   matrix_clear(&matrix);
-//   matrix_render_user(&matrix);
-//   matrix_update(&display, &matrix);
-// }
-// #endif//SSD1306OLED
-
 // Called when a key pressed/released.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
@@ -478,7 +406,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     default:
 #ifdef OLED_DRIVER_ENABLE
-      // oled_clear();
       oled_off();
 #endif // OLED_DRIVER_ENABLE
   }
