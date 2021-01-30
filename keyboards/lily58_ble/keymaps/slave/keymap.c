@@ -189,7 +189,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  [_QWERTY] = LAYOUT( \
    KC_ESC,   CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                CS_6,    CS_7,    CS_8,    CS_9,    CS_0, KC_BSPC, \
    KC_TAB,   KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    MINS, \
-  KC_CAPS,   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                KC_H,    KC_J,    KC_K,    KC_L,    SCLN,    QUOT, \
+  KC_LCTL,   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                KC_H,    KC_J,    KC_K,    KC_L,    SCLN,    QUOT, \
     SHIFT,   KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,  LPRN,  RPRN,  KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,   SHIFT, \
                         KC_LALT, KC_LGUI, MO(_LOWER), KC_SPC,  KC_ENT, MO(_RAISE), KC_RGUI, KC_RALT \
 ),
@@ -306,13 +306,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   /* ADJUST
    * ,-----------------------------------------.                    ,-----------------------------------------.
-   * |      |BT_ID1|BT_ID2|BT_ID3|BT_ID4|BT_ID5|                    |BT_ID6|BT_ID7|      |      |      |      |
+   * |      |BT_ID0|BT_ID1|BT_ID2|BT_ID3|BT_ID4|                    |BT_ID5|BT_ID6|      |      |      |      |
    * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
    * |      |      | WIN  |      |      |      |                    |      |  US  | INFO |      |      |      |
    * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
    * |      |      |      |      |      |      |-------.    ,-------|      | JIS  |      |      |      |      |
    * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
-   * |      |      |      |      |     |BATT_LV|-------|    |-------|      | MAC  |      |      |      |      |
+   * |     |AD_WO_L|SEL_BLE|SEL_USB|    |      |-------|    |-------|      | MAC  |      |      |      |      |
    * `-----------------------------------------/       /     \      \-----------------------------------------'
    *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
    *                   |      |      |      |/       /         \      \ |      |      |      |
@@ -322,7 +322,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   XXXXXXX,  BT_ID1,     BT_ID2,  BT_ID3,  BT_ID4,  BT_ID5,                    BT_ID6,  BT_ID7, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
   XXXXXXX, XXXXXXX, QWERTY_WIN, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,      US,    INFO, XXXXXXX, XXXXXXX, XXXXXXX, \
   XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,     JIS, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-  XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+  _______, AD_WO_L,    SEL_BLE, SEL_USB, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
                                 _______, _______, _______, _______, _______,  _______, _______, _______ \
   )
 };
@@ -371,13 +371,12 @@ void set_default_kb_layout(bool layout) {
   eeconfig_update_user(kb_config.raw);
 }
 
-
 #ifdef OLED_DRIVER_ENABLE
 // Display information on OLEDs.
 void show_info_oled() {
 #ifdef CONSOLE_ENABLE
   uprintf("show_info_oled\n");
-#endif
+#endif // CONSOLE_ENABLE
   if (is_keyboard_master()) {
     oled_on();
     char os[24] = "OS: ";
@@ -450,10 +449,40 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       // The code is based on tmk_core/protocol/nrf/bmp.c
       if (record->event.pressed) {
         if (shift_pressed) {
+#ifdef CONSOLE_ENABLE
+          uprintf("[lilyble] Delete BT_ID:%d\n", keycode - BT_ID0);
+#endif // CONSOLE_ENABLE
           BMPAPI->ble.delete_bond(keycode - BT_ID0);
         } else {
+#ifdef CONSOLE_ENABLE
+          uprintf("[lilyble] Advertise BT_ID:%d\n", keycode - BT_ID0);
+#endif // CONSOLE_ENABLE
           BMPAPI->ble.advertise(keycode - BT_ID0);
         }
+      }
+      return false;
+    case SEL_BLE:
+      if (record->event.pressed) {
+#ifdef CONSOLE_ENABLE
+        uprintf("[lilyble] SEL_BLE\n");
+#endif // CONSOLE_ENABLE
+        select_ble();
+      }
+      return false;
+    case SEL_USB:
+      if (record->event.pressed) {
+#ifdef CONSOLE_ENABLE
+        uprintf("[lilyble] SEL_USB\n");
+#endif // CONSOLE_ENABLE
+        select_usb();
+      }
+      return false;
+    case AD_WO_L:
+      if (record->event.pressed) {
+#ifdef CONSOLE_ENABLE
+        uprintf("[lilyble] AD_WO_L\n");
+#endif // CONSOLE_ENABLE
+        BMPAPI->ble.advertise(255);
       }
       return false;
     case INFO:
