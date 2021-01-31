@@ -19,7 +19,6 @@ extern uint8_t is_master;
 #define SHIFT_DU(CODE_DOWN, CODE_UP) (shift_pressed ? CODE_DOWN : CODE_UP)
 #define CASE_US(CODE, US, JIS)                   \
     case CODE:                                  \
-        uprintf("CASE_US\n"); \
         (kb_layout == JIS_LAYOUT ? JIS : US); \
         return false;
 
@@ -313,7 +312,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |      |      |      |      |      |      |-------.    ,-------|      | JIS  |      |      |      |      |
  * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * |     |AD_WO_L|SEL_BLE|SEL_USB|    |      |-------|    |-------|      | MAC  |      |      |      |      |
+ * |    |AD_WO_L|SEL_BLE|SEL_USB|    |BATT_LV|-------|    |-------|      | MAC  |      |      |      |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
  *                   |      |      |      |/       /         \      \ |      |      |      |
@@ -323,7 +322,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   XXXXXXX,  BT_ID1,     BT_ID2,  BT_ID3,  BT_ID4,  BT_ID5,                    BT_ID6,  BT_ID7, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
   XXXXXXX, XXXXXXX, QWERTY_WIN, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,      US,    INFO, XXXXXXX, XXXXXXX, XXXXXXX, \
   XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,     JIS, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-  _______, AD_WO_L,    SEL_BLE, SEL_USB, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
+  _______, AD_WO_L,    SEL_BLE, SEL_USB, XXXXXXX, BATT_LV, XXXXXXX, XXXXXXX, XXXXXXX,  QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
                                 _______, _______, _______, _______, _______,  _______, _______, _______ \
 )
 };
@@ -484,6 +483,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         uprintf("[lilyble] AD_WO_L\n");
 #endif // CONSOLE_ENABLE
         BMPAPI->ble.advertise(255);
+      }
+      return false;
+    case BATT_LV:
+      if (record->event.pressed) {
+        char str[10];
+        snprintf(str, sizeof(str), "%4dmV", BMPAPI->app.get_vcc_mv());
+        send_string(str);
       }
       return false;
     case INFO:
