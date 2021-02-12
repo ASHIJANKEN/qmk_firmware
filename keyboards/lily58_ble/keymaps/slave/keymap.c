@@ -22,15 +22,9 @@ extern uint8_t is_master;
   case CODE:                                                \
     {                                                       \
       bool need_hankaku = is_kana && record->event.pressed; \
-      if (os_mode == WINDOWS_MODE) {                        \
-        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(INT5);  \
-        (kb_layout == JIS_LAYOUT ? JIS : US);               \
-        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(INT4);  \
-      } else {                                              \
-        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG2); \
-        (kb_layout == JIS_LAYOUT ? JIS : US);               \
-        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG1); \
-      }                                                     \
+      if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG2);   \
+      (kb_layout == JIS_LAYOUT ? JIS : US);                 \
+      if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG1);   \
       return false;                                         \
     }
 
@@ -421,7 +415,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       oled_off();
 #endif // OLED_DRIVER_ENABLE
   }
-
   switch (keycode) {
     CASE_US(CS_0, KEY(0), SHIFT_DU(KEY_SHIFT(9), KEY(0)));
     CASE_US(CS_1, KEY(1), KEY(1));
@@ -547,22 +540,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         shift_pressed = false;
       }
       return false;
+    case KC_MHEN:
+    case 23843: // NonConvert
+    case KC_LANG2:
     case KC_LGUI:
       if (record->event.pressed) {
         is_kana = false;
       }
       return true;
-    case KC_RGUI:
-      if (record->event.pressed) {
-        is_kana = true;
-      }
-      return true;
-    case KC_MHEN:
-      if (record->event.pressed) {
-        is_kana = false;
-      }
-      return true;
     case KC_HENK:
+    case 23844: // Convert
+    case KC_LANG1:
+    case KC_RGUI:
       if (record->event.pressed) {
         is_kana = true;
       }
