@@ -16,11 +16,23 @@ extern uint8_t is_master;
 #define KEY(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define KEY_SHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define KEY_UPSHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
+#define HANKAKU_SHIFT_CONSISTENCE(CODE) (shift_pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_TAP(X_##CODE) SS_DOWN(X_LSHIFT)) : SEND_STRING(SS_TAP(X_##CODE)))
 #define SHIFT_DU(CODE_DOWN, CODE_UP) (shift_pressed ? CODE_DOWN : CODE_UP)
-#define CASE_US(CODE, US, JIS)                   \
-    case CODE:                                  \
-        (kb_layout == JIS_LAYOUT ? JIS : US); \
-        return false;
+#define CASE_US(CODE, US, JIS)                              \
+  case CODE:                                                \
+    {                                                       \
+      bool need_hankaku = is_kana && record->event.pressed; \
+      if (os_mode == WINDOWS_MODE) {                        \
+        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(INT5);  \
+        (kb_layout == JIS_LAYOUT ? JIS : US);               \
+        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(INT4);  \
+      } else {                                              \
+        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG2); \
+        (kb_layout == JIS_LAYOUT ? JIS : US);               \
+        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG1); \
+      }                                                     \
+      return false;                                         \
+    }
 
 // #define OLED_TIMEOUT 0
 #define JIS_LAYOUT true
@@ -169,6 +181,7 @@ kb_config_t kb_config;
 bool kb_layout = US_LAYOUT;
 bool shift_pressed = false;
 bool os_mode = false;
+bool is_kana = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -534,7 +547,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         shift_pressed = false;
       }
       return false;
-      break;
+    case KC_LGUI:
+      if (record->event.pressed) {
+        is_kana = false;
+      }
+      return true;
+    case KC_RGUI:
+      if (record->event.pressed) {
+        is_kana = true;
+      }
+      return true;
+    case KC_MHEN:
+      if (record->event.pressed) {
+        is_kana = false;
+      }
+      return true;
+    case KC_HENK:
+      if (record->event.pressed) {
+        is_kana = true;
+      }
+      return true;
   }
   return true;
 }

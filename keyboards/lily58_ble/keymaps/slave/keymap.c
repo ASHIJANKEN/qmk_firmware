@@ -16,11 +16,23 @@ extern uint8_t is_master;
 #define KEY(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define KEY_SHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define KEY_UPSHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
+#define HANKAKU_SHIFT_CONSISTENCE(CODE) (shift_pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_TAP(X_##CODE) SS_DOWN(X_LSHIFT)) : SEND_STRING(SS_TAP(X_##CODE)))
 #define SHIFT_DU(CODE_DOWN, CODE_UP) (shift_pressed ? CODE_DOWN : CODE_UP)
-#define CASE_US(CODE, US, JIS)                   \
-    case CODE:                                  \
-        (kb_layout == JIS_LAYOUT ? JIS : US); \
-        return false;
+#define CASE_US(CODE, US, JIS)                              \
+  case CODE:                                                \
+    {                                                       \
+      bool need_hankaku = is_kana && record->event.pressed; \
+      if (os_mode == WINDOWS_MODE) {                        \
+        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(INT5);  \
+        (kb_layout == JIS_LAYOUT ? JIS : US);               \
+        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(INT4);  \
+      } else {                                              \
+        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG2); \
+        (kb_layout == JIS_LAYOUT ? JIS : US);               \
+        if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG1); \
+      }                                                     \
+      return false;                                         \
+    }
 
 // #define OLED_TIMEOUT 0
 #define JIS_LAYOUT true
@@ -70,36 +82,36 @@ enum custom_keycodes {
   BT_ID6,
   BT_ID7,
   INFO,
-  CIRC,
-  AT,
-  LBRC,
-  RBRC,
-  BSLS,
-  AMPR,
-  QUOT,
-  LPRN,
-  RPRN,
-  EQL,
-  TILD,
-  PIPE,
-  GRV,
-  LCBR,
-  PLUS,
-  ASTR,
-  RCBR,
-  UNDS,
-  MINS,
-  SCLN,
-  BIKKURI, // Name of "EXLM" causes a bug of conflicting to EX().
-  HASH,
-  DLR,
-  PERC,
-  DEL,
+  MY_CIRC,
+  MY_AT,
+  MY_LBRC,
+  MY_RBRC,
+  MY_BSLS,
+  MY_AMPR,
+  MY_QUOT,
+  MY_LPRN,
+  MY_RPRN,
+  MY_EQL,
+  MY_TILD,
+  MY_PIPE,
+  MY_GRV,
+  MY_LCBR,
+  MY_PLUS,
+  MY_ASTR,
+  MY_RCBR,
+  MY_UNDS,
+  MY_MINS,
+  MY_SCLN,
+  MY_BKKR, // Name of "EXLM" causes a bug of conflicting to EX().
+  MY_HASH,
+  MY_DLR,
+  MY_PERC,
+  MY_DEL,
 };
 
 const key_string_map_t custom_keys_user = {
   .start_kc = QWERTY,
-  .end_kc = DEL,
+  .end_kc = MY_DEL,
   .key_strings =
     "QWERTY\0"
     "QWERTY_WIN\0"
@@ -130,31 +142,31 @@ const key_string_map_t custom_keys_user = {
     "BT_ID6\0"
     "BT_ID7\0"
     "INFO\0"
-    "CIRC\0"
-    "AT\0"
-    "LBRC\0"
-    "RBRC\0"
-    "BSLS\0"
-    "AMPR\0"
-    "QUOT\0"
-    "LPRN\0"
-    "RPRN\0"
-    "EQL\0"
-    "TILD\0"
-    "PIPE\0"
-    "GRV\0"
-    "LCBR\0"
-    "PLUS\0"
-    "ASTR\0"
-    "RCBR\0"
-    "UNDS\0"
-    "MINS\0"
-    "SCLN\0"
-    "BIKKURI\0"
-    "HASH\0"
-    "DLR\0"
-    "PERC\0"
-    "DEL\0"
+    "MY_CIRC\0"
+    "MY_AT\0"
+    "MY_LBRC\0"
+    "MY_RBRC\0"
+    "MY_BSLS\0"
+    "MY_AMPR\0"
+    "MY_QUOT\0"
+    "MY_LPRN\0"
+    "MY_RPRN\0"
+    "MY_EQL\0"
+    "MY_TILD\0"
+    "MY_PIPE\0"
+    "MY_GRV\0"
+    "MY_LCBR\0"
+    "MY_PLUS\0"
+    "MY_ASTR\0"
+    "MY_RCBR\0"
+    "MY_UNDS\0"
+    "MY_MINS\0"
+    "MY_SCLN\0"
+    "MY_BKKR\0"
+    "MY_HASH\0"
+    "MY_DLR\0"
+    "MY_PERC\0"
+    "MY_DEL\0"
 };
 
 typedef union {
@@ -169,6 +181,7 @@ kb_config_t kb_config;
 bool kb_layout = US_LAYOUT;
 bool shift_pressed = false;
 bool os_mode = false;
+bool is_kana = false;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -187,11 +200,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                   `----------------------------'           '------''--------------------'
  */
  [_QWERTY] = LAYOUT( \
-   KC_ESC,   CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                CS_6,    CS_7,    CS_8,    CS_9,    CS_0, KC_BSPC, \
-   KC_TAB,   KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    MINS, \
-  KC_LCTL,   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                KC_H,    KC_J,    KC_K,    KC_L,    SCLN,    QUOT, \
-    SHIFT,   KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,  LPRN,  RPRN,  KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,   SHIFT, \
-                        KC_LALT, KC_LGUI, MO(_LOWER), KC_SPC,  KC_ENT, MO(_RAISE), KC_RGUI, KC_RALT \
+   KC_ESC, CS_1, CS_2, CS_3, CS_4, CS_5,                   CS_6, CS_7,    CS_8,    CS_9,    CS_0,    KC_BSPC, \
+   KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T,                   KC_Y, KC_U,    KC_I,    KC_O,    KC_P,    MY_MINS, \
+  KC_CAPS, KC_A, KC_S, KC_D, KC_F, KC_G,                   KC_H, KC_J,    KC_K,    KC_L, MY_SCLN,    MY_QUOT, \
+    SHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, MY_LPRN, MY_RPRN, KC_N, KC_M, KC_COMM,  KC_DOT, KC_SLSH,      SHIFT, \
+            KC_LALT, KC_LGUI, MO(_LOWER), KC_SPC, KC_ENT, MO(_RAISE), KC_RGUI, KC_RALT \
 ),
 
 /* LOWER
@@ -209,11 +222,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                   `----------------------------'           '------''--------------------'
  */
 [_LOWER] = LAYOUT( \
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,             XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
-    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,               KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, \
-     TILD, BIKKURI,      AT,    HASH,     DLR,    PERC,                CIRC,    AMPR,    ASTR,    LPRN,    RPRN,    TILD, \
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, LBRC, RBRC, XXXXXXX, UNDS, PLUS, LCBR, RCBR, PIPE, \
-                          _______, _______, _______, _______, _______,  _______, _______, _______\
+  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
+    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                     KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, \
+  MY_TILD, MY_BKKR,   MY_AT, MY_HASH,  MY_DLR, MY_PERC,                   MY_CIRC, MY_AMPR, MY_ASTR, MY_LPRN, MY_RPRN, MY_TILD, \
+  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MY_LBRC, MY_RBRC, XXXXXXX, MY_UNDS, MY_PLUS, MY_LCBR, MY_RCBR, MY_PIPE, \
+                             _______, _______, _______, _______, _______, _______, _______, _______\
 ),
 
 /* RAISE
@@ -222,7 +235,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |   `  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |-------.    ,-------|      | Left | Down |  Up  |Right |      |
+ * |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |-------.    ,-------| Left | Down |  Up  |Right |      |      |
  * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
  * |  F7  |  F8  |  F9  | F10  | F11  | F12  |-------|    |-------|   +  |   -  |   =  |   [  |   ]  |   \  |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
@@ -231,11 +244,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                   `----------------------------'           '------''--------------------'
  */
 [_RAISE] = LAYOUT( \
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,             XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_DEL, \
-      GRV,    CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                CS_6,    CS_7,    CS_8,    CS_9,    CS_0, _______, \
-    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,             XXXXXXX, KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, \
-  _______,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, LBRC, RBRC,    PLUS,    MINS,     EQL,    LBRC,    RBRC,    BSLS, \
-                         _______, _______, _______,  _______, _______,  _______, _______, _______ \
+  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_DEL, \
+   MY_GRV,    CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                      CS_6,    CS_7,    CS_8,    CS_9,    CS_0, _______, \
+    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                   KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, XXXXXXX, \
+  _______,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, MY_LBRC, MY_RBRC, MY_PLUS, MY_MINS,  MY_EQL, MY_LBRC, MY_RBRC, MY_BSLS, \
+                             _______, _______, _______, _______, _______, _______, _______, _______ \
 ),
 
 /* QWERTY_WIN
@@ -253,78 +266,78 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                   `----------------------------'           '------''--------------------'
  */
  [_QWERTY_WIN] = LAYOUT( \
-   KC_ESC,   CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                      CS_6,    CS_7,    CS_8,    CS_9,    CS_0, KC_BSPC, \
-   KC_TAB,   JP_Q,    JP_W,    JP_E,    JP_R,    JP_T,                      JP_Y,    JP_U,    JP_I,    JP_O,    JP_P,    MINS, \
-  KC_LCTL,   JP_A,    JP_S,    JP_D,    JP_F,    JP_G,                      JP_H,    JP_J,    JP_K,    JP_L,    SCLN,    QUOT, \
-    SHIFT,   JP_Z,    JP_X,    JP_C,    JP_V,    JP_B, KC_MHEN, KC_HENK,    JP_N,    JP_M, KC_COMM,  KC_DOT, KC_SLSH,   SHIFT, \
-      KC_LALT, MO(_LOWER_WIN), LT(_LOWER_WIN, KC_MHEN), KC_SPC, KC_ENT, LT(_RAISE_WIN, KC_HENK), MO(_RAISE_WIN), KC_RALT \
+   KC_ESC,    CS_1,   CS_2,   CS_3,   CS_4,   CS_5,                   CS_6,   CS_7,      CS_8,     CS_9,      CS_0,   KC_BSPC, \
+   KC_TAB,    JP_Q,   JP_W,   JP_E,   JP_R,   JP_T,                   JP_Y,   JP_U,      JP_I,     JP_O,      JP_P,   MY_MINS, \
+  KC_LCTL,    JP_A,   JP_S,   JP_D,   JP_F,   JP_G,                   JP_H,   JP_J,      JP_K,     JP_L,   MY_SCLN,   MY_QUOT, \
+    SHIFT,    JP_Z,   JP_X,   JP_C,   JP_V,   JP_B, KC_MHEN, KC_HENK, JP_N,   JP_M,   KC_COMM,   KC_DOT,   KC_SLSH,     SHIFT, \
+  KC_LALT, KC_LGUI, LT(_LOWER_WIN, KC_MHEN), KC_SPC, KC_ENT, LT(_RAISE_WIN, KC_HENK), MO(_RAISE_WIN), KC_RALT \
 ),
 
-  /* LOWER_WIN
-   * ,-----------------------------------------.                    ,-----------------------------------------.
-   * |      |      |      |      |      |      |                    |      |      |      |      |      |      |
-   * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-   * |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |                    |  F7  |  F8  |  F9  | F10  | F11  | F12  |
-   * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-   * |   `  |   !  |   @  |   #  |   $  |   %  |-------.    ,-------| Left | Down |  Up  |Right |      |   ~  |
-   * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
-   * |LShift|   ^  |   &  |   *  |   (  |   )  |-------|    |-------|      |   _  |   +  |   {  |   }  |RShift|
-   * `-----------------------------------------/       /     \      \-----------------------------------------'
-   *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
-   *                   |      |      |      |/       /         \      \ |      |      |      |
-   *                   `----------------------------'           '------''--------------------'
-   */
-  [_LOWER_WIN] = LAYOUT( \
-    _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,             XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
-      KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,               KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, \
-        GRV, BIKKURI,      AT,    HASH,     DLR,    PERC,             KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX,    TILD, \
-    _______,    CIRC,    AMPR,    ASTR,    LPRN,    RPRN, LBRC, RBRC, XXXXXXX,    UNDS,    PLUS,    LCBR,    RCBR, _______, \
-                            _______, _______, _______, _______, _______, _______, _______, _______\
-  ),
+/* LOWER_WIN
+ * ,-----------------------------------------.                    ,-----------------------------------------.
+ * |      |      |      |      |      |      |                    |      |      |      |      |      |      |
+ * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
+ * |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |                    |  F7  |  F8  |  F9  | F10  | F11  | F12  |
+ * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
+ * |   `  |   !  |   @  |   #  |   $  |   %  |-------.    ,-------| Left | Down |  Up  |Right |      |   ~  |
+ * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
+ * |LShift|   ^  |   &  |   *  |   (  |   )  |-------|    |-------|      |   _  |   +  |   {  |   }  |RShift|
+ * `-----------------------------------------/       /     \      \-----------------------------------------'
+ *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
+ *                   |      |      |      |/       /         \      \ |      |      |      |
+ *                   `----------------------------'           '------''--------------------'
+ */
+[_LOWER_WIN] = LAYOUT( \
+  _______,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
+    KC_F1,      KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                     KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, \
+   MY_GRV, MY_BKKR,   MY_AT, MY_HASH,  MY_DLR, MY_PERC,                   KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, MY_TILD, \
+  _______,    MY_CIRC, MY_AMPR, MY_ASTR, MY_LPRN, MY_RPRN, MY_LBRC, MY_RBRC, XXXXXXX, MY_UNDS, MY_PLUS, MY_LCBR, MY_RCBR, _______, \
+                                _______, _______, _______, _______, _______, _______, _______, _______\
+),
 
-  /* RAISE_WIN
-   * ,-----------------------------------------.                    ,-----------------------------------------.
-   * |      |      |      |      |      |      |                    |      |      |      |      |      |DELETE|
-   * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-   * |   `  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |      |
-   * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-   * |      |      |      |      |      |      |-------.    ,-------| Left | Down |  Up  |Right |      |      |
-   * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
-   * |LShift|      |      |      |      |      |-------|    |-------|   +  |   -  |   =  |   [  |   \  |RShift|
-   * `-----------------------------------------/       /     \      \-----------------------------------------'
-   *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
-   *                   |      |      |      |/       /         \      \ |      |      |      |
-   *                   `----------------------------'           '------''--------------------'
-   */
-  [_RAISE_WIN] = LAYOUT( \
-    _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,              XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_DEL, \
-        GRV,    CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                 CS_6,    CS_7,    CS_8,    CS_9,    CS_0, XXXXXXX, \
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,              KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, XXXXXXX, \
-    _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  LBRC, RBRC,    PLUS,    MINS,     EQL,    LBRC,    BSLS, _______, \
+/* RAISE_WIN
+ * ,-----------------------------------------.                    ,-----------------------------------------.
+ * |      |      |      |      |      |      |                    |      |      |      |      |      |DELETE|
+ * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
+ * |   `  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |      |
+ * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
+ * |      |      |      |      |      |      |-------.    ,-------| Left | Down |  Up  |Right |      |      |
+ * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
+ * |LShift|      |      |      |      |      |-------|    |-------|   +  |   -  |   =  |   [  |   \  |RShift|
+ * `-----------------------------------------/       /     \      \-----------------------------------------'
+ *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
+ *                   |      |      |      |/       /         \      \ |      |      |      |
+ *                   `----------------------------'           '------''--------------------'
+ */
+[_RAISE_WIN] = LAYOUT( \
+  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_DEL, \
+   MY_GRV,    CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                      CS_6,    CS_7,    CS_8,    CS_9,    CS_0, XXXXXXX, \
+  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, XXXXXXX, \
+  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MY_LBRC, MY_RBRC, MY_PLUS, MY_MINS,  MY_EQL, MY_LBRC, MY_BSLS, _______, \
                             _______, _______, _______,  _______, _______,  _______, _______, _______ \
-  ),
+),
 
-  /* ADJUST
-   * ,-----------------------------------------.                    ,-----------------------------------------.
-   * |      |BT_ID0|BT_ID1|BT_ID2|BT_ID3|BT_ID4|                    |BT_ID5|BT_ID6|      |      |      |      |
-   * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-   * |      |      | WIN  |      |      |      |                    |      |  US  | INFO |      |      |      |
-   * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
-   * |      |      |      |      |      |      |-------.    ,-------|      | JIS  |      |      |      |      |
-   * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
-   * |     |AD_WO_L|SEL_BLE|SEL_USB|    |      |-------|    |-------|      | MAC  |      |      |      |      |
-   * `-----------------------------------------/       /     \      \-----------------------------------------'
-   *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
-   *                   |      |      |      |/       /         \      \ |      |      |      |
-   *                   `----------------------------'           '------''--------------------'
-   */
-  [_ADJUST] = LAYOUT( \
+/* ADJUST
+ * ,-----------------------------------------.                    ,-----------------------------------------.
+ * |      |BT_ID0|BT_ID1|BT_ID2|BT_ID3|BT_ID4|                    |BT_ID5|BT_ID6|      |      |      |      |
+ * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
+ * |      |      | WIN  |      |      |      |                    |      |  US  | INFO |      |      |      |
+ * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
+ * |      |      |      |      |      |      |-------.    ,-------|      | JIS  |      |      |      |      |
+ * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
+ * |    |AD_WO_L|SEL_BLE|SEL_USB|    |BATT_LV|-------|    |-------|      | MAC  |      |      |      |      |
+ * `-----------------------------------------/       /     \      \-----------------------------------------'
+ *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
+ *                   |      |      |      |/       /         \      \ |      |      |      |
+ *                   `----------------------------'           '------''--------------------'
+ */
+[_ADJUST] = LAYOUT( \
   XXXXXXX,  BT_ID1,     BT_ID2,  BT_ID3,  BT_ID4,  BT_ID5,                    BT_ID6,  BT_ID7, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
   XXXXXXX, XXXXXXX, QWERTY_WIN, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,      US,    INFO, XXXXXXX, XXXXXXX, XXXXXXX, \
   XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,     JIS, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-  _______, AD_WO_L,    SEL_BLE, SEL_USB, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
+  _______, AD_WO_L,    SEL_BLE, SEL_USB, XXXXXXX, BATT_LV, XXXXXXX, XXXXXXX, XXXXXXX,  QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
                                 _______, _______, _______, _______, _______,  _______, _______, _______ \
-  )
+)
 };
 
 int layer_state_to_num(layer_state_t state) {
@@ -420,31 +433,31 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     CASE_US(CS_7, KEY(7), SHIFT_DU(KEY_SHIFT(6), KEY(7)));
     CASE_US(CS_8, KEY(8), SHIFT_DU(KEY_SHIFT(QUOTE), KEY(8)));
     CASE_US(CS_9, KEY(9), SHIFT_DU(KEY_SHIFT(8), KEY(9)));
-    CASE_US(DEL, KEY(DELETE), KEY_UPSHIFT(BSPACE));
-    CASE_US(TILD, KEY_SHIFT(GRAVE), KEY_SHIFT(EQUAL));
-    CASE_US(BIKKURI, KEY_SHIFT(1), KEY_SHIFT(1));
-    CASE_US(AT, KEY_SHIFT(2), KEY(LBRACKET));
-    CASE_US(HASH, KEY_SHIFT(3), KEY_SHIFT(3));
-    CASE_US(DLR, KEY_SHIFT(4), KEY_SHIFT(4));
-    CASE_US(PERC, KEY_SHIFT(5), KEY_SHIFT(5));
-    CASE_US(CIRC, KEY_SHIFT(6), KEY(EQUAL));
-    CASE_US(AMPR, KEY_SHIFT(7), KEY_SHIFT(6));
-    CASE_US(ASTR, KEY_SHIFT(8), KEY_SHIFT(QUOTE));
-    CASE_US(LPRN, KEY_SHIFT(9), KEY_SHIFT(8));
-    CASE_US(RPRN, KEY_SHIFT(0), KEY_SHIFT(9));
-    CASE_US(LBRC, KEY(LBRACKET), SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
-    CASE_US(RBRC, KEY(RBRACKET), SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
-    CASE_US(LCBR, KEY_SHIFT(LBRACKET), KEY_SHIFT(RBRACKET));
-    CASE_US(RCBR, KEY_SHIFT(RBRACKET), KEY_SHIFT(NONUS_HASH));
-    CASE_US(GRV, KEY(GRAVE), SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
-    CASE_US(BSLS, KEY(BSLASH), SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
-    CASE_US(PIPE, KEY_SHIFT(BSLASH), KEY_SHIFT(INT3));
-    CASE_US(MINS, KEY(MINUS), SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
-    CASE_US(UNDS, KEY_SHIFT(MINUS), KEY_SHIFT(INT1));
-    CASE_US(EQL, KEY(EQUAL), SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
-    CASE_US(PLUS, KEY_SHIFT(EQUAL), KEY_SHIFT(SCOLON));
-    CASE_US(SCLN, KEY(SCOLON), SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
-    CASE_US(QUOT, KEY(QUOTE), SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
+    CASE_US(MY_DEL, KEY(DELETE), KEY_UPSHIFT(BSPACE));
+    CASE_US(MY_TILD, KEY_SHIFT(GRAVE), KEY_SHIFT(EQUAL));
+    CASE_US(MY_BKKR, KEY_SHIFT(1), KEY_SHIFT(1));
+    CASE_US(MY_AT, KEY_SHIFT(2), KEY(LBRACKET));
+    CASE_US(MY_HASH, KEY_SHIFT(3), KEY_SHIFT(3));
+    CASE_US(MY_DLR, KEY_SHIFT(4), KEY_SHIFT(4));
+    CASE_US(MY_PERC, KEY_SHIFT(5), KEY_SHIFT(5));
+    CASE_US(MY_CIRC, KEY_SHIFT(6), KEY(EQUAL));
+    CASE_US(MY_AMPR, KEY_SHIFT(7), KEY_SHIFT(6));
+    CASE_US(MY_ASTR, KEY_SHIFT(8), KEY_SHIFT(QUOTE));
+    CASE_US(MY_LPRN, KEY_SHIFT(9), KEY_SHIFT(8));
+    CASE_US(MY_RPRN, KEY_SHIFT(0), KEY_SHIFT(9));
+    CASE_US(MY_LBRC, KEY(LBRACKET), SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
+    CASE_US(MY_RBRC, KEY(RBRACKET), SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
+    CASE_US(MY_LCBR, KEY_SHIFT(LBRACKET), KEY_SHIFT(RBRACKET));
+    CASE_US(MY_RCBR, KEY_SHIFT(RBRACKET), KEY_SHIFT(NONUS_HASH));
+    CASE_US(MY_GRV, KEY(GRAVE), SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
+    CASE_US(MY_BSLS, KEY(BSLASH), SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
+    CASE_US(MY_PIPE, KEY_SHIFT(BSLASH), KEY_SHIFT(INT3));
+    CASE_US(MY_MINS, KEY(MINUS), SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
+    CASE_US(MY_UNDS, KEY_SHIFT(MINUS), KEY_SHIFT(INT1));
+    CASE_US(MY_EQL, KEY(EQUAL), SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
+    CASE_US(MY_PLUS, KEY_SHIFT(EQUAL), KEY_SHIFT(SCOLON));
+    CASE_US(MY_SCLN, KEY(SCOLON), SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
+    CASE_US(MY_QUOT, KEY(QUOTE), SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
     case BT_ID0 ... BT_ID7:
       // The code is based on tmk_core/protocol/nrf/bmp.c
       if (record->event.pressed) {
@@ -483,6 +496,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         uprintf("[lilyble] AD_WO_L\n");
 #endif // CONSOLE_ENABLE
         BMPAPI->ble.advertise(255);
+      }
+      return false;
+    case BATT_LV:
+      if (record->event.pressed) {
+        char str[10];
+        snprintf(str, sizeof(str), "%4dmV", BMPAPI->app.get_vcc_mv());
+        send_string(str);
       }
       return false;
     case INFO:
@@ -527,7 +547,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         shift_pressed = false;
       }
       return false;
-      break;
+    case KC_LGUI:
+      if (record->event.pressed) {
+        is_kana = false;
+      }
+      return true;
+    case KC_RGUI:
+      if (record->event.pressed) {
+        is_kana = true;
+      }
+      return true;
+    case KC_MHEN:
+      if (record->event.pressed) {
+        is_kana = false;
+      }
+      return true;
+    case KC_HENK:
+      if (record->event.pressed) {
+        is_kana = true;
+      }
+      return true;
   }
   return true;
 }
