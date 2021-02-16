@@ -6,49 +6,49 @@
 [
  "KC_ESC", "CS_1", "CS_2", "CS_3", "CS_4", "CS_5",                       "CS_6", "CS_7",    "CS_8",   "CS_9",    "CS_0", "KC_BSPC",
  "KC_TAB", "KC_Q", "KC_W", "KC_E", "KC_R", "KC_T",                       "KC_Y", "KC_U",    "KC_I",   "KC_O",    "KC_P", "MY_MINS",
-"KC_CAPS", "KC_A", "KC_S", "KC_D", "KC_F", "KC_G",                       "KC_H", "KC_J",    "KC_K",   "KC_L",    "MY_SCLN", "MY_QUOT",
+"KC_CAPS", "KC_A", "KC_S", "KC_D", "KC_F", "KC_G",                       "KC_H", "KC_J",    "KC_K",   "KC_L", "MY_SCLN", "MY_QUOT",
   "SHIFT", "KC_Z", "KC_X", "KC_C", "KC_V", "KC_B", "MY_LPRN", "MY_RPRN", "KC_N", "KC_M", "KC_COMM", "KC_DOT", "KC_SLSH",   "SHIFT",
                      "KC_LALT", "KC_LGUI", "MO(1)", "KC_SPC", "KC_ENT", "MO(2)", "KC_RGUI", "KC_RALT"
 ],
 
 [
-"KC_TRNS",      "KC_NO", "KC_NO",   "KC_NO",  "KC_NO",   "KC_NO",                         "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO", "KC_TRNS",
-  "KC_F1",      "KC_F2", "KC_F3",   "KC_F4",  "KC_F5",   "KC_F6",                         "KC_F7",   "KC_F8",   "KC_F9",  "KC_F10",  "KC_F11",  "KC_F12",
+"KC_TRNS",   "KC_NO", "KC_NO",   "KC_NO",  "KC_NO",   "KC_NO",                         "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO", "KC_TRNS",
+  "KC_F1",   "KC_F2", "KC_F3",   "KC_F4",  "KC_F5",   "KC_F6",                         "KC_F7",   "KC_F8",   "KC_F9",  "KC_F10",  "KC_F11",  "KC_F12",
 "MY_TILD", "MY_BKKR", "MY_AT", "MY_HASH", "MY_DLR", "MY_PERC",                       "MY_CIRC", "MY_AMPR", "MY_ASTR", "MY_LPRN", "MY_RPRN", "MY_TILD",
-"KC_TRNS",      "KC_NO", "KC_NO",   "KC_NO",  "KC_NO",   "KC_NO", "MY_LBRC", "MY_RBRC",   "KC_NO", "MY_UNDS", "MY_PLUS", "MY_LCBR", "MY_RCBR", "MY_PIPE",
-                      "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
+"KC_TRNS",   "KC_NO", "KC_NO",   "KC_NO",  "KC_NO",   "KC_NO", "MY_LBRC", "MY_RBRC",   "KC_NO", "MY_UNDS", "MY_PLUS", "MY_LCBR", "MY_RCBR", "MY_PIPE",
+                              "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
 ],
 
 [
-"KC_TRNS", "KC_NO", "KC_NO",  "KC_NO",  "KC_NO",  "KC_NO",                 "KC_NO",   "KC_NO",   "KC_NO",  "KC_NO",   "KC_NO",  "KC_DEL",
-    "MY_GRV",  "CS_1",  "CS_2",   "CS_3",   "CS_4",   "CS_5",                  "CS_6",    "CS_7",    "CS_8",   "CS_9",    "CS_0", "KC_TRNS",
-  "KC_F1", "KC_F2", "KC_F3",  "KC_F4",  "KC_F5",  "KC_F6",                 "KC_NO", "KC_LEFT", "KC_DOWN",  "KC_UP", "KC_RGHT",   "KC_NO",
-"KC_TRNS", "KC_F8", "KC_F9", "KC_F10", "KC_F11", "KC_F12", "MY_LBRC", "MY_RBRC",  "MY_PLUS",    "MY_MINS",     "MY_EQL",   "MY_LBRC",    "MY_RBRC",    "MY_BSLS",
-                       "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
+"KC_TRNS", "KC_NO", "KC_NO",  "KC_NO",  "KC_NO",  "KC_NO",                         "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO",  "KC_DEL",
+ "MY_GRV",  "CS_1",  "CS_2",   "CS_3",   "CS_4",   "CS_5",                          "CS_6",    "CS_7",    "CS_8",    "CS_9",    "CS_0", "KC_TRNS",
+  "KC_F1", "KC_F2", "KC_F3",  "KC_F4",  "KC_F5",  "KC_F6",                         "KC_NO", "KC_LEFT", "KC_DOWN",   "KC_UP", "KC_RGHT",   "KC_NO",
+"KC_TRNS", "KC_F8", "KC_F9", "KC_F10", "KC_F11", "KC_F12", "MY_LBRC", "MY_RBRC", "MY_PLUS", "MY_MINS",  "MY_EQL", "MY_LBRC", "MY_RBRC", "MY_BSLS",
+                          "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
 ],
 
 [
  "KC_ESC", "CS_1", "CS_2", "CS_3", "CS_4", "CS_5",                       "CS_6", "CS_7",    "CS_8",   "CS_9",    "CS_0", "KC_BSPC",
- "KC_TAB", "JP_Q", "JP_W", "JP_E", "JP_R", "JP_T",                       "JP_Y", "JP_U",    "JP_I",   "JP_O",    "JP_P",    "MY_MINS",
-"KC_LCTL", "JP_A", "JP_S", "JP_D", "JP_F", "JP_G",                       "JP_H", "JP_J",    "JP_K",   "JP_L",    "MY_SCLN",    "MY_QUOT",
+ "KC_TAB", "JP_Q", "JP_W", "JP_E", "JP_R", "JP_T",                       "JP_Y", "JP_U",    "JP_I",   "JP_O",    "JP_P", "MY_MINS",
+"KC_LCTL", "JP_A", "JP_S", "JP_D", "JP_F", "JP_G",                       "JP_H", "JP_J",    "JP_K",   "JP_L", "MY_SCLN", "MY_QUOT",
   "SHIFT", "JP_Z", "JP_X", "JP_C", "JP_V", "JP_B", "KC_MHEN", "KC_HENK", "JP_N", "JP_M", "KC_COMM", "KC_DOT", "KC_SLSH",   "SHIFT",
        "KC_LALT", "KC_LGUI", "EX(LTE(4, KC_MHEN))", "KC_SPC", "KC_ENT", "EX(LTE(5, KC_HENK))", "MO(5)", "KC_RALT"
 ],
 
 [
-"KC_TRNS",   "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO",                   "KC_NO",   "KC_NO", "KC_NO",   "KC_NO",  "KC_NO", "KC_TRNS",
-  "KC_F1",   "KC_F2", "KC_F3", "KC_F4", "KC_F5", "KC_F6",                   "KC_F7",   "KC_F8", "KC_F9",  "KC_F10", "KC_F11",  "KC_F12",
-    "MY_GRV", "MY_BKKR",    "MY_AT",  "MY_HASH",   "MY_DLR",  "MY_PERC",                 "KC_LEFT", "KC_DOWN", "KC_UP", "KC_RGHT",  "KC_NO",    "MY_TILD",
-"KC_TRNS",    "MY_CIRC",  "MY_AMPR",  "MY_ASTR",  "MY_LPRN",  "MY_RPRN", "MY_LBRC", "MY_RBRC",   "KC_NO",    "MY_UNDS",  "MY_PLUS",    "MY_LCBR",   "MY_RCBR", "KC_TRNS",
-                    "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
+"KC_TRNS",   "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO",                         "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO",   "KC_NO", "KC_TRNS",
+  "KC_F1",   "KC_F2",   "KC_F3",   "KC_F4",   "KC_F5",   "KC_F6",                         "KC_F7",   "KC_F8",   "KC_F9",  "KC_F10",  "KC_F11",  "KC_F12",
+ "MY_GRV", "MY_BKKR",   "MY_AT", "MY_HASH",  "MY_DLR", "MY_PERC",                       "KC_LEFT", "KC_DOWN",   "KC_UP", "KC_RGHT",   "KC_NO", "MY_TILD",
+"KC_TRNS", "MY_CIRC", "MY_AMPR", "MY_ASTR", "MY_LPRN", "MY_RPRN", "MY_LBRC", "MY_RBRC",   "KC_NO", "MY_UNDS", "MY_PLUS", "MY_LCBR", "MY_RCBR", "KC_TRNS",
+                                 "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
 ],
 
 [
-"KC_TRNS", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO",                   "KC_NO",   "KC_NO", "KC_NO",   "KC_NO", "KC_NO",  "KC_DEL",
-    "MY_GRV",  "CS_1",  "CS_2",  "CS_3",  "CS_4",  "CS_5",                    "CS_6",    "CS_7",  "CS_8",    "CS_9",  "CS_0",   "KC_NO",
-  "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO",                 "KC_LEFT", "KC_DOWN", "KC_UP", "KC_RGHT", "KC_NO",   "KC_NO",
-"KC_TRNS", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "MY_LBRC", "MY_RBRC",    "MY_PLUS",    "MY_MINS",   "MY_EQL",    "MY_LBRC",  "MY_BSLS", "KC_TRNS",
-                    "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
+"KC_TRNS", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO",                         "KC_NO",   "KC_NO",  "KC_NO",   "KC_NO",   "KC_NO",  "KC_DEL",
+ "MY_GRV",  "CS_1",  "CS_2",  "CS_3",  "CS_4",  "CS_5",                          "CS_6",    "CS_7",   "CS_8",    "CS_9",    "CS_0",   "KC_NO",
+  "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO",                       "KC_LEFT", "KC_DOWN",  "KC_UP", "KC_RGHT",   "KC_NO",   "KC_NO",
+"KC_TRNS", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "KC_NO", "MY_LBRC", "MY_RBRC", "MY_PLUS", "MY_MINS", "MY_EQL", "MY_LBRC", "MY_BSLS", "KC_TRNS",
+                       "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
 ],
 
 [
