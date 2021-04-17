@@ -105,11 +105,13 @@ enum custom_keycodes {
   MY_DLR,
   MY_PERC,
   MY_DEL,
+  MY_EISU,
+  MY_KANA,
 };
 
 const key_string_map_t custom_keys_user = {
   .start_kc = QWERTY,
-  .end_kc = MY_DEL,
+  .end_kc = MY_KANA,
   .key_strings =
     "QWERTY\0"
     "QWERTY_WIN\0"
@@ -165,6 +167,8 @@ const key_string_map_t custom_keys_user = {
     "MY_DLR\0"
     "MY_PERC\0"
     "MY_DEL\0"
+    "MY_EISU\0"
+    "MY_KANA\0"
 };
 
 typedef union {
@@ -560,6 +564,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         is_kana = true;
       }
       return true;
+    case MY_KANA:
+      if (record->event.pressed) {
+        tap_code(KC_LANG1);
+      }
+      return false;
+    case MY_EISU:
+      if (record->event.pressed) {
+        uprintf("MY_EISU\n");
+        tap_code(KC_LANG2);
+      }
+      return false;
   }
   return true;
 }
