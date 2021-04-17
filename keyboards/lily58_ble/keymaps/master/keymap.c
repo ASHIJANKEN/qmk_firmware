@@ -105,13 +105,11 @@ enum custom_keycodes {
   MY_DLR,
   MY_PERC,
   MY_DEL,
-  MY_EISU,
-  MY_KANA,
 };
 
 const key_string_map_t custom_keys_user = {
   .start_kc = QWERTY,
-  .end_kc = MY_KANA,
+  .end_kc = MY_DEL,
   .key_strings =
     "QWERTY\0"
     "QWERTY_WIN\0"
@@ -167,8 +165,6 @@ const key_string_map_t custom_keys_user = {
     "MY_DLR\0"
     "MY_PERC\0"
     "MY_DEL\0"
-    "MY_EISU\0"
-    "MY_KANA\0"
 };
 
 typedef union {
@@ -411,6 +407,11 @@ void show_info_oled() {
 
 // Called when a key pressed/released.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  bool continue_process = process_record_user_bmp(keycode, record);
+  if (continue_process == false) {
+      return false;
+  }
+
   switch (keycode) {
     case JIS:
     case US:
@@ -475,37 +476,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
       }
       return false;
-    case SEL_BLE:
-      if (record->event.pressed) {
-#ifdef CONSOLE_ENABLE
-        uprintf("[lilyble] SEL_BLE\n");
-#endif // CONSOLE_ENABLE
-        select_ble();
-      }
-      return false;
-    case SEL_USB:
-      if (record->event.pressed) {
-#ifdef CONSOLE_ENABLE
-        uprintf("[lilyble] SEL_USB\n");
-#endif // CONSOLE_ENABLE
-        select_usb();
-      }
-      return false;
-    case AD_WO_L:
-      if (record->event.pressed) {
-#ifdef CONSOLE_ENABLE
-        uprintf("[lilyble] AD_WO_L\n");
-#endif // CONSOLE_ENABLE
-        BMPAPI->ble.advertise(255);
-      }
-      return false;
-    case BATT_LV:
-      if (record->event.pressed) {
-        char str[10];
-        snprintf(str, sizeof(str), "%4dmV", BMPAPI->app.get_vcc_mv());
-        send_string(str);
-      }
-      return false;
     case INFO:
       if (record->event.pressed) {
         show_info_oled();
@@ -564,17 +534,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         is_kana = true;
       }
       return true;
-    case MY_KANA:
-      if (record->event.pressed) {
-        tap_code(KC_LANG1);
-      }
-      return false;
-    case MY_EISU:
-      if (record->event.pressed) {
-        uprintf("MY_EISU\n");
-        tap_code(KC_LANG2);
-      }
-      return false;
   }
   return true;
 }
