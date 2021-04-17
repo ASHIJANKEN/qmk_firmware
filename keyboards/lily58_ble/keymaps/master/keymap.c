@@ -42,11 +42,9 @@ void show_info_oled(void);
 
 enum layer_number {
   _QWERTY = 0,
+  _QWERTY_WIN,
   _LOWER,
   _RAISE,
-  _QWERTY_WIN,
-  _LOWER_WIN,
-  _RAISE_WIN,
   _ADJUST,
 };
 
@@ -181,162 +179,8 @@ bool shift_pressed = false;
 bool os_mode = false;
 bool is_kana = false;
 
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-
-/* QWERTY
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * | ESC  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |BackSP|
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | Tab  |   Q  |   W  |   E  |   R  |   T  |                    |   Y  |   U  |   I  |   O  |   P  |  -   |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | LCTRL|   A  |   S  |   D  |   F  |   G  |-------.    ,-------|   H  |   J  |   K  |   L  |   ;  |  '   |
- * |------+------+------+------+------+------|   (   |    |    )  |------+------+------+------+------+------|
- * |LShift|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  |RShift|
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   | LAlt | LOWER| LGUI | /Space  /       \Enter \  | RGUI | RAISE| RAlt |
- *                   |      |      |      |/       /         \      \ |      |      |      |
- *                   `----------------------------'           '------''--------------------'
- */
- [_QWERTY] = LAYOUT( \
-   KC_ESC, CS_1, CS_2, CS_3, CS_4, CS_5,                   CS_6, CS_7,    CS_8,    CS_9,    CS_0,    KC_BSPC, \
-   KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T,                   KC_Y, KC_U,    KC_I,    KC_O,    KC_P,    MY_MINS, \
-  KC_CAPS, KC_A, KC_S, KC_D, KC_F, KC_G,                   KC_H, KC_J,    KC_K,    KC_L, MY_SCLN,    MY_QUOT, \
-    SHIFT, KC_Z, KC_X, KC_C, KC_V, KC_B, MY_LPRN, MY_RPRN, KC_N, KC_M, KC_COMM,  KC_DOT, KC_SLSH,      SHIFT, \
-            KC_LALT, KC_LGUI, MO(_LOWER), KC_SPC, KC_ENT, MO(_RAISE), KC_RGUI, KC_RALT \
-),
-
-/* LOWER
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * |      |      |      |      |      |      |                    |      |      |      |      |      |      |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |                    |  F7  |  F8  |  F9  | F10  | F11  | F12  |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |   ~  |   !  |   @  |   #  |   $  |   %  |-------.    ,-------|   ^  |   &  |   *  |   (  |   )  |   -  |
- * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------|    |-------|      |   _  |   +  |   {  |   }  |   |  |
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   | LAlt | LOWER| LGUI | /Space  /       \Enter \  | RGUI | RAISE| RAlt |
- *                   |      |      |      |/       /         \      \ |      |      |      |
- *                   `----------------------------'           '------''--------------------'
- */
-[_LOWER] = LAYOUT( \
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
-    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                     KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, \
-  MY_TILD, MY_BKKR,   MY_AT, MY_HASH,  MY_DLR, MY_PERC,                   MY_CIRC, MY_AMPR, MY_ASTR, MY_LPRN, MY_RPRN, MY_TILD, \
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MY_LBRC, MY_RBRC, XXXXXXX, MY_UNDS, MY_PLUS, MY_LCBR, MY_RCBR, MY_PIPE, \
-                             _______, _______, _______, _______, _______, _______, _______, _______\
-),
-
-/* RAISE
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * |      |      |      |      |      |      |                    |      |      |      |      |      |DELETE|
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |   `  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |      |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |-------.    ,-------| Left | Down |  Up  |Right |      |      |
- * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
- * |  F7  |  F8  |  F9  | F10  | F11  | F12  |-------|    |-------|   +  |   -  |   =  |   [  |   ]  |   \  |
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   | LAlt | LOWER| LGUI | /Space  /       \Enter \  | RGUI | RAISE| RAlt |
- *                   |      |      |      |/       /         \      \ |      |      |      |
- *                   `----------------------------'           '------''--------------------'
- */
-[_RAISE] = LAYOUT( \
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_DEL, \
-   MY_GRV,    CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                      CS_6,    CS_7,    CS_8,    CS_9,    CS_0, _______, \
-    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                   KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, XXXXXXX, \
-  _______,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, MY_LBRC, MY_RBRC, MY_PLUS, MY_MINS,  MY_EQL, MY_LBRC, MY_RBRC, MY_BSLS, \
-                             _______, _______, _______, _______, _______, _______, _______, _______ \
-),
-
-/* QWERTY_WIN
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * | ESC  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |BackSP|
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | Tab  |   Q  |   W  |   E  |   R  |   T  |                    |   Y  |   U  |   I  |   O  |   P  |  -   |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |LCTRL |   A  |   S  |   D  |   F  |   G  |-------.    ,-------|   H  |   J  |   K  |   L  |   ;  |  '   |
- * |------+------+------+------+------+------| MUHEN |    |HENKAN |------+------+------+------+------+------|
- * |LShift|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  |RShift|
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   | LAlt | LOWER|LOWER | /Space  /       \Enter \  |RAISE |RAISE | RAlt |
- *                   |      |      |      |/       /         \      \ |      |      |      |
- *                   `----------------------------'           '------''--------------------'
- */
- [_QWERTY_WIN] = LAYOUT( \
-   KC_ESC,    CS_1,   CS_2,   CS_3,   CS_4,   CS_5,                   CS_6,   CS_7,      CS_8,     CS_9,      CS_0,   KC_BSPC, \
-   KC_TAB,    JP_Q,   JP_W,   JP_E,   JP_R,   JP_T,                   JP_Y,   JP_U,      JP_I,     JP_O,      JP_P,   MY_MINS, \
-  KC_LCTL,    JP_A,   JP_S,   JP_D,   JP_F,   JP_G,                   JP_H,   JP_J,      JP_K,     JP_L,   MY_SCLN,   MY_QUOT, \
-    SHIFT,    JP_Z,   JP_X,   JP_C,   JP_V,   JP_B, KC_MHEN, KC_HENK, JP_N,   JP_M,   KC_COMM,   KC_DOT,   KC_SLSH,     SHIFT, \
-  KC_LALT, KC_LGUI, LT(_LOWER_WIN, KC_MHEN), KC_SPC, KC_ENT, LT(_RAISE_WIN, KC_HENK), MO(_RAISE_WIN), KC_RALT \
-),
-
-/* LOWER_WIN
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * |      |      |      |      |      |      |                    |      |      |      |      |      |      |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |                    |  F7  |  F8  |  F9  | F10  | F11  | F12  |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |   `  |   !  |   @  |   #  |   $  |   %  |-------.    ,-------| Left | Down |  Up  |Right |      |   ~  |
- * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
- * |LShift|   ^  |   &  |   *  |   (  |   )  |-------|    |-------|      |   _  |   +  |   {  |   }  |RShift|
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
- *                   |      |      |      |/       /         \      \ |      |      |      |
- *                   `----------------------------'           '------''--------------------'
- */
-[_LOWER_WIN] = LAYOUT( \
-  _______,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
-    KC_F1,      KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                     KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, \
-   MY_GRV, MY_BKKR,   MY_AT, MY_HASH,  MY_DLR, MY_PERC,                   KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, MY_TILD, \
-  _______,    MY_CIRC, MY_AMPR, MY_ASTR, MY_LPRN, MY_RPRN, MY_LBRC, MY_RBRC, XXXXXXX, MY_UNDS, MY_PLUS, MY_LCBR, MY_RCBR, _______, \
-                                _______, _______, _______, _______, _______, _______, _______, _______\
-),
-
-/* RAISE_WIN
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * |      |      |      |      |      |      |                    |      |      |      |      |      |DELETE|
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |   `  |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |      |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------.    ,-------| Left | Down |  Up  |Right |      |      |
- * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
- * |LShift|      |      |      |      |      |-------|    |-------|   +  |   -  |   =  |   [  |   \  |RShift|
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
- *                   |      |      |      |/       /         \      \ |      |      |      |
- *                   `----------------------------'           '------''--------------------'
- */
-[_RAISE_WIN] = LAYOUT( \
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_DEL, \
-   MY_GRV,    CS_1,    CS_2,    CS_3,    CS_4,    CS_5,                      CS_6,    CS_7,    CS_8,    CS_9,    CS_0, XXXXXXX, \
-  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, XXXXXXX, \
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MY_LBRC, MY_RBRC, MY_PLUS, MY_MINS,  MY_EQL, MY_LBRC, MY_BSLS, _______, \
-                            _______, _______, _______,  _______, _______,  _______, _______, _______ \
-),
-
-/* ADJUST
- * ,-----------------------------------------.                    ,-----------------------------------------.
- * |      |BT_ID0|BT_ID1|BT_ID2|BT_ID3|BT_ID4|                    |BT_ID5|BT_ID6|      |      |      |      |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      | WIN  |      |      |      |                    |      |  US  | INFO |      |      |      |
- * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------.    ,-------|      | JIS  |      |      |      |      |
- * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * |    |AD_WO_L|SEL_BLE|SEL_USB|    |BATT_LV|-------|    |-------|      | MAC  |      |      |      |      |
- * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   |      |      |      | /Space  /       \Enter \  |      |      |      |
- *                   |      |      |      |/       /         \      \ |      |      |      |
- *                   `----------------------------'           '------''--------------------'
- */
-[_ADJUST] = LAYOUT( \
-  XXXXXXX,  BT_ID1,     BT_ID2,  BT_ID3,  BT_ID4,  BT_ID5,                    BT_ID6,  BT_ID7, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-  XXXXXXX, XXXXXXX, QWERTY_WIN, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,      US,    INFO, XXXXXXX, XXXXXXX, XXXXXXX, \
-  XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX,     JIS, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-  _______, AD_WO_L,    SEL_BLE, SEL_USB, XXXXXXX, BATT_LV, XXXXXXX, XXXXXXX, XXXXXXX,  QWERTY, XXXXXXX, XXXXXXX, XXXXXXX, _______, \
-                                _______, _______, _______, _______, _______,  _______, _______, _______ \
-)
-};
+// keymaps[] has no meaning but is necessary to build correctly.
+const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {};
 
 int layer_state_to_num(layer_state_t state) {
   int n = 0;
@@ -348,14 +192,8 @@ int layer_state_to_num(layer_state_t state) {
 
 // Called when a layer changed.
 layer_state_t layer_state_set_user(layer_state_t state) {
-  layer_state_t s = state;
-
-  // Call _ADJUST from MAC_MODE
+  // Call _ADJUST
   state = update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
-  if (s != state) return state;
-
-  // Call _ADJUST from WIN_MODE
-  state = update_tri_layer_state(state, _LOWER_WIN, _RAISE_WIN, _ADJUST);
 
 #ifdef CONSOLE_ENABLE
   uprintf("%d layer_state_set_user\n", state);
