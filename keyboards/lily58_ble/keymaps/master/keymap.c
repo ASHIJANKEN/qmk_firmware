@@ -39,8 +39,8 @@ extern uint8_t is_master;
 void show_info_oled(void);
 
 enum layer_number {
-  _QWERTY = 0,
-  _QWERTY_WIN,
+  _QWERTY_WIN = 0,
+  _QWERTY,
   _LOWER,
   _RAISE,
   _ADJUST,
