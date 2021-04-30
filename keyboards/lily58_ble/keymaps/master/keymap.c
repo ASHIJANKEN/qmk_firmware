@@ -159,15 +159,6 @@ const key_string_map_t custom_keys_user = {
     "MY_DEL\0"
 };
 
-typedef union {
-  uint8_t raw;
-  struct {
-    bool layout:1;
-  };
-} kb_config_t;
-
-kb_config_t kb_config;
-
 bool shift_pressed = false;
 bool os_mode = false;
 bool is_kana = false;
@@ -201,16 +192,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
  * I think this is like init() in Arduino.
  */
 void keyboard_post_init_user(void) {
-  kb_config.raw = eeconfig_read_user();
-  // kb_layout = kb_config.layout;
-  os_mode = layer_state_to_num(eeconfig_read_default_layer()) == _QWERTY ? MAC_MODE : WINDOWS_MODE;
   show_info_oled();
-}
-
-// Set keyboard layout information to eeprom.
-void set_default_kb_layout(bool layout) {
-  kb_config.layout = layout;
-  eeconfig_update_user(kb_config.raw);
 }
 
 #ifdef OLED_DRIVER_ENABLE
