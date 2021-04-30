@@ -23,18 +23,16 @@ extern uint8_t is_master;
     {                                                       \
       bool need_hankaku = is_kana && record->event.pressed; \
       if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG2);   \
-      (kb_layout == JIS_LAYOUT ? JIS : US);                 \
+      JIS;                 \
       if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG1);   \
       return false;                                         \
     }
-#define CASE_US(CODE, US, JIS)            \
+#define CASE_USLIKE(CODE, CORRESPONDENT_JIS_KEY)            \
   case CODE:                              \
-    (kb_layout == JIS_LAYOUT ? JIS : US); \
+    CORRESPONDENT_JIS_KEY; \
     return false;
 
 // #define OLED_TIMEOUT 0
-#define JIS_LAYOUT true
-#define US_LAYOUT false
 #define WINDOWS_MODE true
 #define MAC_MODE false
 
@@ -51,8 +49,6 @@ enum layer_number {
 enum custom_keycodes {
   QWERTY = BMP_SAFE_RANGE,
   QWERTY_WIN,
-  JIS,
-  US,
   UBUNTU,
   MAC,
   SHIFT,
@@ -111,8 +107,6 @@ const key_string_map_t custom_keys_user = {
   .key_strings =
     "QWERTY\0"
     "QWERTY_WIN\0"
-    "JIS\0"
-    "US\0"
     "UBUNTU\0"
     "MAC\0"
     "SHIFT\0"
@@ -174,7 +168,6 @@ typedef union {
 
 kb_config_t kb_config;
 
-bool kb_layout = US_LAYOUT;
 bool shift_pressed = false;
 bool os_mode = false;
 bool is_kana = false;
@@ -209,7 +202,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
  */
 void keyboard_post_init_user(void) {
   kb_config.raw = eeconfig_read_user();
-  kb_layout = kb_config.layout;
+  // kb_layout = kb_config.layout;
   os_mode = layer_state_to_num(eeconfig_read_default_layer()) == _QWERTY ? MAC_MODE : WINDOWS_MODE;
   show_info_oled();
 }
@@ -230,14 +223,11 @@ void show_info_oled() {
     oled_on();
     char os[24] = "OS: ";
     strcat(os, os_mode ? "WINDOWS" : "MAC");
-    char layout[24] = "LAYOUT: ";
-    strcat(layout, kb_layout ? "JIS" : "US");
     char batt[24];
     // The code is based on tmk_core/protocol/nrf/bmp.c
     sprintf(batt, "BATTERY: %4dmV", BMPAPI->app.get_vcc_mv());
     oled_clear();
     oled_write_ln(os, false);
-    oled_write_ln(layout, false);
     oled_write_ln(batt, false);
   }
 }
@@ -251,8 +241,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   }
 
   switch (keycode) {
-    case JIS:
-    case US:
     case QWERTY:
     case QWERTY_WIN:
       ;
@@ -263,41 +251,41 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif // OLED_DRIVER_ENABLE
   }
   switch (keycode) {
-    CASE_US(CS_0, KEY(0), SHIFT_DU(KEY_SHIFT(9), KEY(0)));
-    CASE_US(CS_1, KEY(1), KEY(1));
-    CASE_US(CS_2, KEY(2), SHIFT_DU(KEY_UPSHIFT(LBRACKET), KEY(2)));
-    CASE_US(CS_3, KEY(3), KEY(3));
-    CASE_US(CS_4, KEY(4), KEY(4));
-    CASE_US(CS_5, KEY(5), KEY(5));
-    CASE_US(CS_6, KEY(6), SHIFT_DU(KEY_UPSHIFT(EQUAL), KEY(6)));
-    CASE_US(CS_7, KEY(7), SHIFT_DU(KEY_SHIFT(6), KEY(7)));
-    CASE_US(CS_8, KEY(8), SHIFT_DU(KEY_SHIFT(QUOTE), KEY(8)));
-    CASE_US(CS_9, KEY(9), SHIFT_DU(KEY_SHIFT(8), KEY(9)));
-    CASE_US(MY_DEL, KEY(DELETE), KEY_UPSHIFT(BSPACE));
-    CASE_US(MY_TILD, KEY_SHIFT(GRAVE), KEY_SHIFT(EQUAL));
-    CASE_US(MY_BKKR, KEY_SHIFT(1), KEY_SHIFT(1));
-    CASE_US(MY_AT, KEY_SHIFT(2), KEY(LBRACKET));
-    CASE_US(MY_HASH, KEY_SHIFT(3), KEY_SHIFT(3));
-    CASE_US(MY_DLR, KEY_SHIFT(4), KEY_SHIFT(4));
-    CASE_US(MY_PERC, KEY_SHIFT(5), KEY_SHIFT(5));
-    CASE_US(MY_CIRC, KEY_SHIFT(6), KEY(EQUAL));
-    CASE_US(MY_AMPR, KEY_SHIFT(7), KEY_SHIFT(6));
-    CASE_US(MY_ASTR, KEY_SHIFT(8), KEY_SHIFT(QUOTE));
-    CASE_US(MY_LPRN, KEY_SHIFT(9), KEY_SHIFT(8));
-    CASE_US(MY_RPRN, KEY_SHIFT(0), KEY_SHIFT(9));
-    CASE_US(MY_LBRC, KEY(LBRACKET), SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
-    CASE_US(MY_RBRC, KEY(RBRACKET), SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
-    CASE_US(MY_LCBR, KEY_SHIFT(LBRACKET), KEY_SHIFT(RBRACKET));
-    CASE_US(MY_RCBR, KEY_SHIFT(RBRACKET), KEY_SHIFT(NONUS_HASH));
-    CASE_US(MY_GRV, KEY(GRAVE), SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
-    CASE_US(MY_BSLS, KEY(BSLASH), SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
-    CASE_US(MY_PIPE, KEY_SHIFT(BSLASH), KEY_SHIFT(INT3));
-    CASE_US(MY_MINS, KEY(MINUS), SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
-    CASE_US(MY_UNDS, KEY_SHIFT(MINUS), KEY_SHIFT(INT1));
-    CASE_US(MY_EQL, KEY(EQUAL), SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
-    CASE_US(MY_PLUS, KEY_SHIFT(EQUAL), KEY_SHIFT(SCOLON));
-    CASE_US(MY_SCLN, KEY(SCOLON), SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
-    CASE_US(MY_QUOT, KEY(QUOTE), SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
+    CASE_USLIKE(CS_0, SHIFT_DU(KEY_SHIFT(9), KEY(0)));
+    CASE_USLIKE(CS_1, KEY(1));
+    CASE_USLIKE(CS_2, SHIFT_DU(KEY_UPSHIFT(LBRACKET), KEY(2)));
+    CASE_USLIKE(CS_3, KEY(3));
+    CASE_USLIKE(CS_4, KEY(4));
+    CASE_USLIKE(CS_5, KEY(5));
+    CASE_USLIKE(CS_6, SHIFT_DU(KEY_UPSHIFT(EQUAL), KEY(6)));
+    CASE_USLIKE(CS_7, SHIFT_DU(KEY_SHIFT(6), KEY(7)));
+    CASE_USLIKE(CS_8, SHIFT_DU(KEY_SHIFT(QUOTE), KEY(8)));
+    CASE_USLIKE(CS_9, SHIFT_DU(KEY_SHIFT(8), KEY(9)));
+    CASE_USLIKE(MY_DEL, KEY_UPSHIFT(BSPACE));
+    CASE_USLIKE(MY_TILD, KEY_SHIFT(EQUAL));
+    CASE_USLIKE(MY_BKKR, KEY_SHIFT(1));
+    CASE_USLIKE(MY_AT, KEY(LBRACKET));
+    CASE_USLIKE(MY_HASH, KEY_SHIFT(3));
+    CASE_USLIKE(MY_DLR, KEY_SHIFT(4));
+    CASE_USLIKE(MY_PERC, KEY_SHIFT(5));
+    CASE_USLIKE(MY_CIRC, KEY(EQUAL));
+    CASE_USLIKE(MY_AMPR, KEY_SHIFT(6));
+    CASE_USLIKE(MY_ASTR, KEY_SHIFT(QUOTE));
+    CASE_USLIKE(MY_LPRN, KEY_SHIFT(8));
+    CASE_USLIKE(MY_RPRN, KEY_SHIFT(9));
+    CASE_USLIKE(MY_LBRC, SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
+    CASE_USLIKE(MY_RBRC, SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
+    CASE_USLIKE(MY_LCBR, KEY_SHIFT(RBRACKET));
+    CASE_USLIKE(MY_RCBR, KEY_SHIFT(NONUS_HASH));
+    CASE_USLIKE(MY_GRV, SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
+    CASE_USLIKE(MY_BSLS, SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
+    CASE_USLIKE(MY_PIPE, KEY_SHIFT(INT3));
+    CASE_USLIKE(MY_MINS, SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
+    CASE_USLIKE(MY_UNDS, KEY_SHIFT(INT1));
+    CASE_USLIKE(MY_EQL, SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
+    CASE_USLIKE(MY_PLUS, KEY_SHIFT(SCOLON));
+    CASE_USLIKE(MY_SCLN, SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
+    CASE_USLIKE(MY_QUOT, SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
     case BT_ID0 ... BT_ID7:
       // The code is based on tmk_core/protocol/nrf/bmp.c
       if (record->event.pressed) {
@@ -316,20 +304,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
     case INFO:
       if (record->event.pressed) {
-        show_info_oled();
-      }
-      return false;
-    case JIS:
-      if (record->event.pressed) {
-        kb_layout = JIS_LAYOUT;
-        set_default_kb_layout(kb_layout);
-        show_info_oled();
-      }
-      return false;
-    case US:
-      if (record->event.pressed) {
-        kb_layout = US_LAYOUT;
-        set_default_kb_layout(kb_layout);
         show_info_oled();
       }
       return false;
