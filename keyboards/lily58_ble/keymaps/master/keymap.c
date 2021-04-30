@@ -18,18 +18,19 @@ extern uint8_t is_master;
 #define KEY_UPSHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define HANKAKU_SHIFT_CONSISTENCE(CODE) (shift_pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_TAP(X_##CODE) SS_DOWN(X_LSHIFT)) : SEND_STRING(SS_TAP(X_##CODE)))
 #define SHIFT_DU(CODE_DOWN, CODE_UP) (shift_pressed ? CODE_DOWN : CODE_UP)
-#define CASE_US_AUTO_HANKAKU(CODE, US, JIS)                 \
-  case CODE:                                                \
-    {                                                       \
-      bool need_hankaku = is_kana && record->event.pressed; \
-      if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG2);   \
-      JIS;                 \
-      if (need_hankaku) HANKAKU_SHIFT_CONSISTENCE(LANG1);   \
-      return false;                                         \
-    }
-#define CASE_USLIKE(CODE, CORRESPONDENT_JIS_KEY)            \
-  case CODE:                              \
-    CORRESPONDENT_JIS_KEY; \
+#define CASE_USLIKE_AUTO_HANKAKU(CODE, CORRESPONDENT_JIS_KEY) \
+case CODE:                                                    \
+  if (record->event.pressed) {                                \
+    if (is_kana_internal == true) {                           \
+      HANKAKU_SHIFT_CONSISTENCE(LANG2);                       \
+      is_kana_internal == false;                              \
+    }                                                         \
+    CORRESPONDENT_JIS_KEY;                                    \
+  }                                                           \
+  return false;
+#define CASE_USLIKE(CODE, CORRESPONDENT_JIS_KEY) \
+case CODE:                                       \
+  CORRESPONDENT_JIS_KEY;                         \
     return false;
 
 // #define OLED_TIMEOUT 0
@@ -161,7 +162,10 @@ const key_string_map_t custom_keys_user = {
 
 bool shift_pressed = false;
 bool os_mode = false;
-bool is_kana = false;
+// It means which key user pushed, xKANA or xEISU. User assumes IME is in the mode he chose.
+bool is_kana_user = false;
+// It indicates the actual mode, whether the PC is in EISU mode or KANA mode.
+bool is_kana_internal = false;
 
 // keymaps[] has no meaning but is necessary to build correctly.
 const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {};
@@ -233,41 +237,41 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif // OLED_DRIVER_ENABLE
   }
   switch (keycode) {
-    CASE_USLIKE(CS_0, SHIFT_DU(KEY_SHIFT(9), KEY(0)));
-    CASE_USLIKE(CS_1, KEY(1));
-    CASE_USLIKE(CS_2, SHIFT_DU(KEY_UPSHIFT(LBRACKET), KEY(2)));
-    CASE_USLIKE(CS_3, KEY(3));
-    CASE_USLIKE(CS_4, KEY(4));
-    CASE_USLIKE(CS_5, KEY(5));
-    CASE_USLIKE(CS_6, SHIFT_DU(KEY_UPSHIFT(EQUAL), KEY(6)));
-    CASE_USLIKE(CS_7, SHIFT_DU(KEY_SHIFT(6), KEY(7)));
-    CASE_USLIKE(CS_8, SHIFT_DU(KEY_SHIFT(QUOTE), KEY(8)));
-    CASE_USLIKE(CS_9, SHIFT_DU(KEY_SHIFT(8), KEY(9)));
-    CASE_USLIKE(MY_DEL, KEY_UPSHIFT(BSPACE));
-    CASE_USLIKE(MY_TILD, KEY_SHIFT(EQUAL));
-    CASE_USLIKE(MY_BKKR, KEY_SHIFT(1));
-    CASE_USLIKE(MY_AT, KEY(LBRACKET));
-    CASE_USLIKE(MY_HASH, KEY_SHIFT(3));
-    CASE_USLIKE(MY_DLR, KEY_SHIFT(4));
-    CASE_USLIKE(MY_PERC, KEY_SHIFT(5));
-    CASE_USLIKE(MY_CIRC, KEY(EQUAL));
-    CASE_USLIKE(MY_AMPR, KEY_SHIFT(6));
-    CASE_USLIKE(MY_ASTR, KEY_SHIFT(QUOTE));
-    CASE_USLIKE(MY_LPRN, KEY_SHIFT(8));
-    CASE_USLIKE(MY_RPRN, KEY_SHIFT(9));
-    CASE_USLIKE(MY_LBRC, SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
-    CASE_USLIKE(MY_RBRC, SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
-    CASE_USLIKE(MY_LCBR, KEY_SHIFT(RBRACKET));
-    CASE_USLIKE(MY_RCBR, KEY_SHIFT(NONUS_HASH));
-    CASE_USLIKE(MY_GRV, SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
-    CASE_USLIKE(MY_BSLS, SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
-    CASE_USLIKE(MY_PIPE, KEY_SHIFT(INT3));
-    CASE_USLIKE(MY_MINS, SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
-    CASE_USLIKE(MY_UNDS, KEY_SHIFT(INT1));
-    CASE_USLIKE(MY_EQL, SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
-    CASE_USLIKE(MY_PLUS, KEY_SHIFT(SCOLON));
-    CASE_USLIKE(MY_SCLN, SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
-    CASE_USLIKE(MY_QUOT, SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
+    CASE_USLIKE_AUTO_HANKAKU(CS_0, SHIFT_DU(KEY_SHIFT(9), KEY(0)));
+    CASE_USLIKE_AUTO_HANKAKU(CS_1, KEY(1));
+    CASE_USLIKE_AUTO_HANKAKU(CS_2, SHIFT_DU(KEY_UPSHIFT(LBRACKET), KEY(2)));
+    CASE_USLIKE_AUTO_HANKAKU(CS_3, KEY(3));
+    CASE_USLIKE_AUTO_HANKAKU(CS_4, KEY(4));
+    CASE_USLIKE_AUTO_HANKAKU(CS_5, KEY(5));
+    CASE_USLIKE_AUTO_HANKAKU(CS_6, SHIFT_DU(KEY_UPSHIFT(EQUAL), KEY(6)));
+    CASE_USLIKE_AUTO_HANKAKU(CS_7, SHIFT_DU(KEY_SHIFT(6), KEY(7)));
+    CASE_USLIKE_AUTO_HANKAKU(CS_8, SHIFT_DU(KEY_SHIFT(QUOTE), KEY(8)));
+    CASE_USLIKE_AUTO_HANKAKU(CS_9, SHIFT_DU(KEY_SHIFT(8), KEY(9)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_DEL, KEY_UPSHIFT(BSPACE));
+    CASE_USLIKE_AUTO_HANKAKU(MY_TILD, KEY_SHIFT(EQUAL));
+    CASE_USLIKE_AUTO_HANKAKU(MY_BKKR, KEY_SHIFT(1));
+    CASE_USLIKE_AUTO_HANKAKU(MY_AT, KEY(LBRACKET));
+    CASE_USLIKE_AUTO_HANKAKU(MY_HASH, KEY_SHIFT(3));
+    CASE_USLIKE_AUTO_HANKAKU(MY_DLR, KEY_SHIFT(4));
+    CASE_USLIKE_AUTO_HANKAKU(MY_PERC, KEY_SHIFT(5));
+    CASE_USLIKE_AUTO_HANKAKU(MY_CIRC, KEY(EQUAL));
+    CASE_USLIKE_AUTO_HANKAKU(MY_AMPR, KEY_SHIFT(6));
+    CASE_USLIKE_AUTO_HANKAKU(MY_ASTR, KEY_SHIFT(QUOTE));
+    CASE_USLIKE_AUTO_HANKAKU(MY_LPRN, KEY_SHIFT(8));
+    CASE_USLIKE_AUTO_HANKAKU(MY_RPRN, KEY_SHIFT(9));
+    CASE_USLIKE_AUTO_HANKAKU(MY_LBRC, SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_RBRC, SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_LCBR, KEY_SHIFT(RBRACKET));
+    CASE_USLIKE_AUTO_HANKAKU(MY_RCBR, KEY_SHIFT(NONUS_HASH));
+    CASE_USLIKE_AUTO_HANKAKU(MY_GRV, SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_BSLS, SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_PIPE, KEY_SHIFT(INT3));
+    CASE_USLIKE_AUTO_HANKAKU(MY_MINS, SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_UNDS, KEY_SHIFT(INT1));
+    CASE_USLIKE_AUTO_HANKAKU(MY_EQL, SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_PLUS, KEY_SHIFT(SCOLON));
+    CASE_USLIKE_AUTO_HANKAKU(MY_SCLN, SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_QUOT, SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
     case BT_ID0 ... BT_ID7:
       // The code is based on tmk_core/protocol/nrf/bmp.c
       if (record->event.pressed) {
@@ -316,16 +320,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case 23843: // NonConvert
     case KC_LANG2:
     case KC_LGUI:
+    case xEISU:
       if (record->event.pressed) {
-        is_kana = false;
+        is_kana_user = false;
+        is_kana_internal = false;
       }
       return true;
     case KC_HENK:
     case 23844: // Convert
     case KC_LANG1:
     case KC_RGUI:
+    case xKANA:s
       if (record->event.pressed) {
-        is_kana = true;
+        is_kana_user = true;
+        is_kana_internal = true;
+      }
+      return true;
+    case JP_A ... JP_Z:
+    case KC_A ... KC_Z:
+      if (record->event.pressed) {
+        if (is_kana_user != is_kana_internal) {
+          if (is_kana_user == true) {
+            tap_code(KC_LANG1);
+            is_kana_internal = true;
+          } else {
+            tap_code(KC_LANG2);
+            is_kana_internal = false;
+          }
+        }
       }
       return true;
   }
