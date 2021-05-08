@@ -95,6 +95,7 @@ enum custom_keycodes {
   MY_UNDS,
   MY_MINS,
   MY_SCLN,
+  MY_COLN,
   MY_BKKR, // Name of "EXLM" causes a bug of conflicting to EX().
   MY_HASH,
   MY_DLR,
@@ -155,6 +156,7 @@ const key_string_map_t custom_keys_user = {
     "MY_UNDS\0"
     "MY_MINS\0"
     "MY_SCLN\0"
+    "MY_COLN\0"
     "MY_BKKR\0"
     "MY_HASH\0"
     "MY_DLR\0"
@@ -273,6 +275,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     CASE_USLIKE_AUTO_HANKAKU(MY_EQL, SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
     CASE_USLIKE_AUTO_HANKAKU(MY_PLUS, KEY_SHIFT(SCOLON));
     CASE_USLIKE_AUTO_HANKAKU(MY_SCLN, SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
+    CASE_USLIKE_AUTO_HANKAKU(MY_COLN, KEY_UPSHIFT(QUOTE));
     CASE_USLIKE_AUTO_HANKAKU(MY_QUOT, SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
     case BT_ID0 ... BT_ID7:
       // The code is based on tmk_core/protocol/nrf/bmp.c
