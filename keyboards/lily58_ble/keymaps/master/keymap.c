@@ -23,7 +23,7 @@ case CODE:                                                    \
   if (record->event.pressed) {                                \
     if (is_kana_internal == true) {                           \
       HANKAKU_SHIFT_CONSISTENCE(LANG2);                       \
-      is_kana_internal == false;                              \
+      is_kana_internal = false;                               \
     }                                                         \
     CORRESPONDENT_JIS_KEY;                                    \
   }                                                           \
@@ -330,13 +330,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case 23844: // Convert
     case KC_LANG1:
     case KC_RGUI:
-    case xKANA:s
+    case xKANA:
       if (record->event.pressed) {
         is_kana_user = true;
         is_kana_internal = true;
       }
       return true;
-    case JP_A ... JP_Z:
     case KC_A ... KC_Z:
       if (record->event.pressed) {
         if (is_kana_user != is_kana_internal) {
