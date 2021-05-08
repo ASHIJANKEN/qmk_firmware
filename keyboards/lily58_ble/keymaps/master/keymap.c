@@ -20,13 +20,11 @@ extern uint8_t is_master;
 #define SHIFT_DU(CODE_DOWN, CODE_UP) (shift_pressed ? CODE_DOWN : CODE_UP)
 #define CASE_USLIKE_AUTO_HANKAKU(CODE, CORRESPONDENT_JIS_KEY) \
 case CODE:                                                    \
-  if (record->event.pressed) {                                \
-    if (is_kana_internal == true) {                           \
-      HANKAKU_SHIFT_CONSISTENCE(LANG2);                       \
-      is_kana_internal = false;                               \
-    }                                                         \
-    CORRESPONDENT_JIS_KEY;                                    \
+  if (record->event.pressed && is_kana_internal == true) {    \
+    HANKAKU_SHIFT_CONSISTENCE(LANG2);                         \
+    is_kana_internal = false;                                 \
   }                                                           \
+  CORRESPONDENT_JIS_KEY;                                      \
   return false;
 #define CASE_USLIKE(CODE, CORRESPONDENT_JIS_KEY) \
 case CODE:                                       \
@@ -75,6 +73,8 @@ enum custom_keycodes {
   BT_ID6,
   BT_ID7,
   INFO,
+  MY_EISU,
+  MY_KANA,
   MY_CIRC,
   MY_AT,
   MY_LBRC,
@@ -133,6 +133,8 @@ const key_string_map_t custom_keys_user = {
     "BT_ID6\0"
     "BT_ID7\0"
     "INFO\0"
+    "MY_EISU\0"
+    "MY_KANA\0"
     "MY_CIRC\0"
     "MY_AT\0"
     "MY_LBRC\0"
@@ -259,14 +261,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     CASE_USLIKE_AUTO_HANKAKU(MY_ASTR, KEY_SHIFT(QUOTE));
     CASE_USLIKE_AUTO_HANKAKU(MY_LPRN, KEY_SHIFT(8));
     CASE_USLIKE_AUTO_HANKAKU(MY_RPRN, KEY_SHIFT(9));
-    CASE_USLIKE_AUTO_HANKAKU(MY_LBRC, SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
-    CASE_USLIKE_AUTO_HANKAKU(MY_RBRC, SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
+    CASE_USLIKE(MY_LBRC, SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
+    CASE_USLIKE(MY_RBRC, SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
     CASE_USLIKE_AUTO_HANKAKU(MY_LCBR, KEY_SHIFT(RBRACKET));
     CASE_USLIKE_AUTO_HANKAKU(MY_RCBR, KEY_SHIFT(NONUS_HASH));
     CASE_USLIKE_AUTO_HANKAKU(MY_GRV, SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
     CASE_USLIKE_AUTO_HANKAKU(MY_BSLS, SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
     CASE_USLIKE_AUTO_HANKAKU(MY_PIPE, KEY_SHIFT(INT3));
-    CASE_USLIKE_AUTO_HANKAKU(MY_MINS, SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
+    CASE_USLIKE(MY_MINS, SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
     CASE_USLIKE_AUTO_HANKAKU(MY_UNDS, KEY_SHIFT(INT1));
     CASE_USLIKE_AUTO_HANKAKU(MY_EQL, SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
     CASE_USLIKE_AUTO_HANKAKU(MY_PLUS, KEY_SHIFT(SCOLON));
@@ -316,26 +318,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         shift_pressed = false;
       }
       return false;
-    case KC_MHEN:
-    case 23843: // NonConvert
-    case KC_LANG2:
-    case KC_LGUI:
-    case xEISU:
+    case MY_EISU:
       if (record->event.pressed) {
+        tap_code(KC_LANG2);
         is_kana_user = false;
         is_kana_internal = false;
       }
-      return true;
-    case KC_HENK:
-    case 23844: // Convert
-    case KC_LANG1:
-    case KC_RGUI:
-    case xKANA:
+      return false;
+    case MY_KANA:
       if (record->event.pressed) {
+        tap_code(KC_LANG1);
         is_kana_user = true;
         is_kana_internal = true;
       }
-      return true;
+      return false;
     case KC_A ... KC_Z:
       if (record->event.pressed) {
         if (is_kana_user != is_kana_internal) {
