@@ -36,11 +36,11 @@
 ],
 
 [
-  "KC_NO", "BT_ID1",     "BT_ID2",  "BT_ID3", "BT_ID4",   "BT_ID5",                   "BT_ID6", "BT_ID7",   "KC_NO",   "KC_NO","KC_NO",  "KC_NO",
-  "KC_NO",  "KC_NO", "QWERTY_WIN",   "KC_NO",  "KC_NO",    "KC_NO",                    "KC_NO",  "KC_NO",    "INFO",   "KC_NO","KC_NO",  "KC_NO",
-  "KC_NO",  "KC_NO",      "KC_NO",   "KC_NO",  "KC_NO",    "KC_NO",                    "KC_NO",  "KC_NO",   "KC_NO",   "KC_NO","KC_NO",  "KC_NO",
-"KC_TRNS","AD_WO_L",    "SEL_BLE", "SEL_USB",  "KC_NO",  "BATT_LV", "KC_NO", "KC_NO",  "KC_NO", "QWERTY", "KC_VOLD", "KC_VOLU","KC_NO","KC_TRNS",
-                                 "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
+  "KC_NO", "BT_ID1",     "BT_ID2",  "BT_ID3", "BT_ID4",   "BT_ID5",                    "BT_ID6", "BT_ID7",   "KC_NO",   "KC_NO", "KC_NO",   "KC_NO",
+  "KC_NO",  "KC_NO", "QWERTY_WIN",   "KC_NO",  "KC_NO",    "KC_NO",                     "KC_NO",  "KC_NO",    "INFO",   "KC_NO", "KC_NO",   "KC_NO",
+  "KC_NO",  "KC_NO",      "KC_NO",   "KC_NO",  "KC_NO",    "KC_NO",                     "KC_NO",  "KC_NO",   "KC_NO",   "KC_NO", "KC_NO",   "KC_NO",
+"KC_TRNS","AD_WO_L",    "SEL_BLE", "SEL_USB",  "KC_NO",  "BATT_LV", "ENT_WEB", "KC_NO", "KC_NO", "QWERTY", "KC_VOLD", "KC_VOLU", "KC_NO", "KC_TRNS",
+                                   "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS", "KC_TRNS"
 ]
 ]
 }
