@@ -8,6 +8,7 @@
 #include "bmp.h"
 #include "bmp_custom_keycode.h"
 #include "keycode_str_converter.h"
+#include "process_combo.h"
 
 extern uint8_t is_master;
 
@@ -174,6 +175,9 @@ bool is_kana_internal = false;
 // keymaps[] has no meaning but is necessary to build correctly.
 const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {};
 
+// Defining this array is required to avoid build error due to commit: 55456cd
+combo_t key_combos[] = {};
+
 int layer_state_to_num(layer_state_t state) {
   int n = 0;
   for (; n < 16; ++n) {
@@ -203,9 +207,9 @@ void keyboard_post_init_user(void) {
   show_info_oled();
 }
 
-#ifdef OLED_DRIVER_ENABLE
 // Display information on OLEDs.
 void show_info_oled() {
+#ifdef OLED_DRIVER_ENABLE
 #ifdef CONSOLE_ENABLE
   uprintf("show_info_oled\n");
 #endif // CONSOLE_ENABLE
@@ -220,8 +224,8 @@ void show_info_oled() {
     oled_write_ln(os, false);
     oled_write_ln(batt, false);
   }
-}
 #endif // OLED_DRIVER_ENABLE
+}
 
 // Called when a key pressed/released.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -236,6 +240,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       ;
       break;
     default:
+      ;
 #ifdef OLED_DRIVER_ENABLE
       oled_off();
 #endif // OLED_DRIVER_ENABLE
