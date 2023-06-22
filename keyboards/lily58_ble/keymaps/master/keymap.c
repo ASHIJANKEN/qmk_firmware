@@ -17,12 +17,12 @@ extern uint8_t is_master;
 #define KEY(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define KEY_SHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define KEY_UPSHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
-#define HANKAKU_SHIFT_CONSISTENCE(CODE) (shift_pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_TAP(X_##CODE) SS_DOWN(X_LSHIFT)) : SEND_STRING(SS_TAP(X_##CODE)))
+#define TAP_WITHOUT_SHIFT(CODE) (shift_pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_TAP(X_##CODE) SS_DOWN(X_LSHIFT)) : SEND_STRING(SS_TAP(X_##CODE)))
 #define SHIFT_DU(CODE_DOWN, CODE_UP) (shift_pressed ? CODE_DOWN : CODE_UP)
 #define CASE_USLIKE_AUTO_HANKAKU(CODE, CORRESPONDENT_JIS_KEY) \
 case CODE:                                                    \
   if (record->event.pressed && is_kana_internal == true) {    \
-    HANKAKU_SHIFT_CONSISTENCE(LANG2);                         \
+    TAP_WITHOUT_SHIFT(LANG2);                         \
     is_kana_internal = false;                                 \
   }                                                           \
   CORRESPONDENT_JIS_KEY;                                      \
@@ -335,7 +335,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
     case MY_KANA:
       if (record->event.pressed) {
-        tap_code(KC_LANG1);
+        TAP_WITHOUT_SHIFT(LANG1);
         is_kana_user = true;
         is_kana_internal = true;
       }
