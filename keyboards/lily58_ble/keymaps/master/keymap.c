@@ -19,14 +19,13 @@ extern uint8_t is_master;
 #define KEY_UPSHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define TAP_WITHOUT_SHIFT(CODE) (shift_pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_TAP(X_##CODE) SS_DOWN(X_LSHIFT)) : SEND_STRING(SS_TAP(X_##CODE)))
 #define SHIFT_DU(CODE_DOWN, CODE_UP) (shift_pressed ? CODE_DOWN : CODE_UP)
-#define CASE_USLIKE_AUTO_HANKAKU(CODE, CORRESPONDENT_JIS_KEY) \
+#define CASE_AUTO_HANKAKU(CODE) \
 case CODE:                                                    \
   if (record->event.pressed && is_kana_internal == true) {    \
     TAP_WITHOUT_SHIFT(LANG2);                         \
     is_kana_internal = false;                                 \
   }                                                           \
-  CORRESPONDENT_JIS_KEY;                                      \
-  return false;
+  return true;
 
 // #define OLED_TIMEOUT 0
 #define WINDOWS_MODE true
@@ -130,7 +129,7 @@ const key_string_map_t custom_keys_user = {
     "MY_HASH\0"
     "MY_DLR\0"
     "MY_PERC\0"
-    "MY_DEL\0"
+    "MY_D1EL\0"
 };
 
 const key_override_t rprn_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_0, JP_RPRN);
@@ -140,6 +139,11 @@ const key_override_t ampr_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_7, JP_
 const key_override_t astr_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_8, JP_ASTR);
 const key_override_t lprn_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_9, JP_LPRN);
 const key_override_t unds_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_MINS, JP_UNDS);
+const key_override_t plus_key_override = ko_make_basic(MOD_MASK_SHIFT, JP_EQL, JP_PLUS);
+const key_override_t tild_key_override = ko_make_basic(MOD_MASK_SHIFT, JP_GRV, JP_TILD);
+const key_override_t pipe_key_override = ko_make_basic(MOD_MASK_SHIFT, JP_YEN, JP_PIPE);
+const key_override_t coln_key_override = ko_make_basic(MOD_MASK_SHIFT, JP_SCLN, JP_COLN);
+const key_override_t dquo_key_override = ko_make_basic(MOD_MASK_SHIFT, JP_QUOT, JP_DQUO);
 
 const key_override_t **key_overrides = (const key_override_t *[]){
   &rprn_key_override,
@@ -149,6 +153,11 @@ const key_override_t **key_overrides = (const key_override_t *[]){
   &astr_key_override,
   &lprn_key_override,
   &unds_key_override,
+  &plus_key_override,
+  &tild_key_override,
+  &pipe_key_override,
+  &coln_key_override,
+  &dquo_key_override,
   NULL
 };
 
@@ -233,38 +242,38 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif // OLED_DRIVER_ENABLE
   }
   switch (keycode) {
-    // CASE_USLIKE_AUTO_HANKAKU(CS_0, SHIFT_DU(KEY_SHIFT(9), KEY(0)));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_1, KEY(1));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_2, SHIFT_DU(KEY_UPSHIFT(LBRACKET), KEY(2)));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_3, KEY(3));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_4, KEY(4));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_5, KEY(5));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_6, SHIFT_DU(KEY_UPSHIFT(EQUAL), KEY(6)));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_7, SHIFT_DU(KEY_SHIFT(6), KEY(7)));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_8, SHIFT_DU(KEY_SHIFT(QUOTE), KEY(8)));
-    // CASE_USLIKE_AUTO_HANKAKU(CS_9, SHIFT_DU(KEY_SHIFT(8), KEY(9)));
-    CASE_USLIKE_AUTO_HANKAKU(MY_DEL, KEY_UPSHIFT(BSPACE));
-    CASE_USLIKE_AUTO_HANKAKU(MY_BKKR, KEY_SHIFT(1));
-    CASE_USLIKE_AUTO_HANKAKU(MY_AT, KEY(LBRACKET));
-    CASE_USLIKE_AUTO_HANKAKU(MY_HASH, KEY_SHIFT(3));
-    CASE_USLIKE_AUTO_HANKAKU(MY_DLR, KEY_SHIFT(4));
-    CASE_USLIKE_AUTO_HANKAKU(MY_PERC, KEY_SHIFT(5));
-    CASE_USLIKE_AUTO_HANKAKU(MY_CIRC, KEY(EQUAL));
-    CASE_USLIKE_AUTO_HANKAKU(MY_AMPR, KEY_SHIFT(6));
-    CASE_USLIKE_AUTO_HANKAKU(MY_ASTR, KEY_SHIFT(QUOTE));
-    CASE_USLIKE_AUTO_HANKAKU(MY_LPRN, KEY_SHIFT(8));
-    CASE_USLIKE_AUTO_HANKAKU(MY_RPRN, KEY_SHIFT(9));
-    CASE_USLIKE_AUTO_HANKAKU(MY_LCBR, KEY_SHIFT(RBRACKET));
-    CASE_USLIKE_AUTO_HANKAKU(MY_RCBR, KEY_SHIFT(NONUS_HASH));
-    CASE_USLIKE_AUTO_HANKAKU(MY_GRV, SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
-    CASE_USLIKE_AUTO_HANKAKU(MY_BSLS, SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
-    CASE_USLIKE_AUTO_HANKAKU(MY_PIPE, KEY_SHIFT(INT3));
-    CASE_USLIKE_AUTO_HANKAKU(MY_UNDS, KEY_SHIFT(INT1));
-    CASE_USLIKE_AUTO_HANKAKU(MY_EQL, SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
-    CASE_USLIKE_AUTO_HANKAKU(MY_PLUS, KEY_SHIFT(SCOLON));
-    CASE_USLIKE_AUTO_HANKAKU(MY_SCLN, SHIFT_DU(KEY_UPSHIFT(QUOTE), KEY(SCOLON)));
-    CASE_USLIKE_AUTO_HANKAKU(MY_COLN, KEY_UPSHIFT(QUOTE));
-    CASE_USLIKE_AUTO_HANKAKU(MY_QUOT, SHIFT_DU(KEY_SHIFT(2), KEY_SHIFT(7)));
+    CASE_AUTO_HANKAKU(KC_0);
+    CASE_AUTO_HANKAKU(KC_1);
+    CASE_AUTO_HANKAKU(KC_2);
+    CASE_AUTO_HANKAKU(KC_3);
+    CASE_AUTO_HANKAKU(KC_4);
+    CASE_AUTO_HANKAKU(KC_5);
+    CASE_AUTO_HANKAKU(KC_6);
+    CASE_AUTO_HANKAKU(KC_7);
+    CASE_AUTO_HANKAKU(KC_8);
+    CASE_AUTO_HANKAKU(KC_9);
+    // CASE_AUTO_HANKAKU(MY_DEL, KEY_UPSHIFT(BSPACE));
+    CASE_AUTO_HANKAKU(JP_EXLM);
+    CASE_AUTO_HANKAKU(JP_AT);
+    CASE_AUTO_HANKAKU(JP_HASH);
+    CASE_AUTO_HANKAKU(JP_DLR);
+    CASE_AUTO_HANKAKU(JP_PERC);
+    CASE_AUTO_HANKAKU(JP_CIRC);
+    CASE_AUTO_HANKAKU(JP_AMPR);
+    CASE_AUTO_HANKAKU(JP_ASTR);
+    CASE_AUTO_HANKAKU(JP_LPRN);
+    CASE_AUTO_HANKAKU(JP_RPRN);
+    CASE_AUTO_HANKAKU(JP_LCBR);
+    CASE_AUTO_HANKAKU(JP_RCBR);
+    CASE_AUTO_HANKAKU(JP_GRV);
+    CASE_AUTO_HANKAKU(JP_YEN);
+    CASE_AUTO_HANKAKU(JP_PIPE);
+    CASE_AUTO_HANKAKU(JP_UNDS);
+    CASE_AUTO_HANKAKU(JP_EQL);
+    CASE_AUTO_HANKAKU(JP_PLUS);
+    CASE_AUTO_HANKAKU(JP_SCLN);
+    CASE_AUTO_HANKAKU(JP_COLN);
+    CASE_AUTO_HANKAKU(JP_QUOT);
     case BT_ID0 ... BT_ID7:
       // The code is based on tmk_core/protocol/nrf/bmp.c
       if (record->event.pressed) {
