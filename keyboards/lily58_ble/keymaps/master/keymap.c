@@ -27,10 +27,6 @@ case CODE:                                                    \
   }                                                           \
   CORRESPONDENT_JIS_KEY;                                      \
   return false;
-#define CASE_USLIKE(CODE, CORRESPONDENT_JIS_KEY) \
-case CODE:                                       \
-  CORRESPONDENT_JIS_KEY;                         \
-    return false;
 
 // #define OLED_TIMEOUT 0
 #define WINDOWS_MODE true
@@ -55,16 +51,6 @@ enum custom_keycodes {
   LOWER,
   RAISE,
   ADJUST,
-  CS_0,
-  CS_1,
-  CS_2,
-  CS_3,
-  CS_4,
-  CS_5,
-  CS_6,
-  CS_7,
-  CS_8,
-  CS_9,
   BT_ID0,
   BT_ID1,
   BT_ID2,
@@ -78,15 +64,12 @@ enum custom_keycodes {
   MY_KANA,
   MY_CIRC,
   MY_AT,
-  MY_LBRC,
-  MY_RBRC,
   MY_BSLS,
   MY_AMPR,
   MY_QUOT,
   MY_LPRN,
   MY_RPRN,
   MY_EQL,
-  MY_TILD,
   MY_PIPE,
   MY_GRV,
   MY_LCBR,
@@ -94,7 +77,6 @@ enum custom_keycodes {
   MY_ASTR,
   MY_RCBR,
   MY_UNDS,
-  MY_MINS,
   MY_SCLN,
   MY_COLN,
   MY_BKKR, // Name of "EXLM" causes a bug of conflicting to EX().
@@ -116,16 +98,6 @@ const key_string_map_t custom_keys_user = {
     "LOWER\0"
     "RAISE\0"
     "ADJUST\0"
-    "CS_0\0"
-    "CS_1\0"
-    "CS_2\0"
-    "CS_3\0"
-    "CS_4\0"
-    "CS_5\0"
-    "CS_6\0"
-    "CS_7\0"
-    "CS_8\0"
-    "CS_9\0"
     "BT_ID0\0"
     "BT_ID1\0"
     "BT_ID2\0"
@@ -139,15 +111,12 @@ const key_string_map_t custom_keys_user = {
     "MY_KANA\0"
     "MY_CIRC\0"
     "MY_AT\0"
-    "MY_LBRC\0"
-    "MY_RBRC\0"
     "MY_BSLS\0"
     "MY_AMPR\0"
     "MY_QUOT\0"
     "MY_LPRN\0"
     "MY_RPRN\0"
     "MY_EQL\0"
-    "MY_TILD\0"
     "MY_PIPE\0"
     "MY_GRV\0"
     "MY_LCBR\0"
@@ -155,7 +124,6 @@ const key_string_map_t custom_keys_user = {
     "MY_ASTR\0"
     "MY_RCBR\0"
     "MY_UNDS\0"
-    "MY_MINS\0"
     "MY_SCLN\0"
     "MY_COLN\0"
     "MY_BKKR\0"
@@ -163,6 +131,25 @@ const key_string_map_t custom_keys_user = {
     "MY_DLR\0"
     "MY_PERC\0"
     "MY_DEL\0"
+};
+
+const key_override_t rprn_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_0, JP_RPRN);
+const key_override_t at_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_2, JP_AT);
+const key_override_t circ_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_6, JP_CIRC);
+const key_override_t ampr_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_7, JP_AMPR);
+const key_override_t astr_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_8, JP_ASTR);
+const key_override_t lprn_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_9, JP_LPRN);
+const key_override_t unds_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_MINS, JP_UNDS);
+
+const key_override_t **key_overrides = (const key_override_t *[]){
+  &rprn_key_override,
+  &at_key_override,
+  &circ_key_override,
+  &ampr_key_override,
+  &astr_key_override,
+  &lprn_key_override,
+  &unds_key_override,
+  NULL
 };
 
 bool shift_pressed = false;
@@ -246,18 +233,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif // OLED_DRIVER_ENABLE
   }
   switch (keycode) {
-    CASE_USLIKE_AUTO_HANKAKU(CS_0, SHIFT_DU(KEY_SHIFT(9), KEY(0)));
-    CASE_USLIKE_AUTO_HANKAKU(CS_1, KEY(1));
-    CASE_USLIKE_AUTO_HANKAKU(CS_2, SHIFT_DU(KEY_UPSHIFT(LBRACKET), KEY(2)));
-    CASE_USLIKE_AUTO_HANKAKU(CS_3, KEY(3));
-    CASE_USLIKE_AUTO_HANKAKU(CS_4, KEY(4));
-    CASE_USLIKE_AUTO_HANKAKU(CS_5, KEY(5));
-    CASE_USLIKE_AUTO_HANKAKU(CS_6, SHIFT_DU(KEY_UPSHIFT(EQUAL), KEY(6)));
-    CASE_USLIKE_AUTO_HANKAKU(CS_7, SHIFT_DU(KEY_SHIFT(6), KEY(7)));
-    CASE_USLIKE_AUTO_HANKAKU(CS_8, SHIFT_DU(KEY_SHIFT(QUOTE), KEY(8)));
-    CASE_USLIKE_AUTO_HANKAKU(CS_9, SHIFT_DU(KEY_SHIFT(8), KEY(9)));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_0, SHIFT_DU(KEY_SHIFT(9), KEY(0)));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_1, KEY(1));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_2, SHIFT_DU(KEY_UPSHIFT(LBRACKET), KEY(2)));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_3, KEY(3));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_4, KEY(4));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_5, KEY(5));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_6, SHIFT_DU(KEY_UPSHIFT(EQUAL), KEY(6)));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_7, SHIFT_DU(KEY_SHIFT(6), KEY(7)));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_8, SHIFT_DU(KEY_SHIFT(QUOTE), KEY(8)));
+    // CASE_USLIKE_AUTO_HANKAKU(CS_9, SHIFT_DU(KEY_SHIFT(8), KEY(9)));
     CASE_USLIKE_AUTO_HANKAKU(MY_DEL, KEY_UPSHIFT(BSPACE));
-    CASE_USLIKE(MY_TILD, KEY_SHIFT(EQUAL));
     CASE_USLIKE_AUTO_HANKAKU(MY_BKKR, KEY_SHIFT(1));
     CASE_USLIKE_AUTO_HANKAKU(MY_AT, KEY(LBRACKET));
     CASE_USLIKE_AUTO_HANKAKU(MY_HASH, KEY_SHIFT(3));
@@ -268,14 +254,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     CASE_USLIKE_AUTO_HANKAKU(MY_ASTR, KEY_SHIFT(QUOTE));
     CASE_USLIKE_AUTO_HANKAKU(MY_LPRN, KEY_SHIFT(8));
     CASE_USLIKE_AUTO_HANKAKU(MY_RPRN, KEY_SHIFT(9));
-    CASE_USLIKE(MY_LBRC, SHIFT_DU(KEY_SHIFT(RBRACKET), KEY(RBRACKET)));
-    CASE_USLIKE(MY_RBRC, SHIFT_DU(KEY_SHIFT(NONUS_HASH), KEY(NONUS_HASH)));
     CASE_USLIKE_AUTO_HANKAKU(MY_LCBR, KEY_SHIFT(RBRACKET));
     CASE_USLIKE_AUTO_HANKAKU(MY_RCBR, KEY_SHIFT(NONUS_HASH));
     CASE_USLIKE_AUTO_HANKAKU(MY_GRV, SHIFT_DU(KEY_SHIFT(EQUAL), KEY_SHIFT(LBRACKET)));
     CASE_USLIKE_AUTO_HANKAKU(MY_BSLS, SHIFT_DU(KEY_SHIFT(INT3), KEY(INT3)));
     CASE_USLIKE_AUTO_HANKAKU(MY_PIPE, KEY_SHIFT(INT3));
-    CASE_USLIKE(MY_MINS, SHIFT_DU(KEY_SHIFT(INT1), KEY(MINUS)));
     CASE_USLIKE_AUTO_HANKAKU(MY_UNDS, KEY_SHIFT(INT1));
     CASE_USLIKE_AUTO_HANKAKU(MY_EQL, SHIFT_DU(KEY_SHIFT(SCOLON), KEY_SHIFT(MINUS)));
     CASE_USLIKE_AUTO_HANKAKU(MY_PLUS, KEY_SHIFT(SCOLON));
