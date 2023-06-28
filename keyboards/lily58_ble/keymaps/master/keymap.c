@@ -12,13 +12,7 @@
 
 extern uint8_t is_master;
 
-// https://qiita.com/m47ch4n/items/1a546f7b1295e0e24a58
-#define SHIFT_RESTORE(STR) (shift_pressed ? SEND_STRING(STR SS_DOWN(X_LSHIFT)) : SEND_STRING(STR SS_UP(X_LSHIFT)))
-#define KEY(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
-#define KEY_SHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_DOWN(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
-#define KEY_UPSHIFT(CODE) (record->event.pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_DOWN(X_##CODE)) : SHIFT_RESTORE(SS_UP(X_##CODE)))
 #define TAP_WITHOUT_SHIFT(CODE) (shift_pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_TAP(X_##CODE) SS_DOWN(X_LSHIFT)) : SEND_STRING(SS_TAP(X_##CODE)))
-#define SHIFT_DU(CODE_DOWN, CODE_UP) (shift_pressed ? CODE_DOWN : CODE_UP)
 #define CASE_AUTO_HANKAKU(CODE) \
 case CODE:                                                    \
   if (record->event.pressed && is_kana_internal == true) {    \
@@ -61,33 +55,11 @@ enum custom_keycodes {
   INFO,
   MY_EISU,
   MY_KANA,
-  MY_CIRC,
-  MY_AT,
-  MY_BSLS,
-  MY_AMPR,
-  MY_QUOT,
-  MY_LPRN,
-  MY_RPRN,
-  MY_EQL,
-  MY_PIPE,
-  MY_GRV,
-  MY_LCBR,
-  MY_PLUS,
-  MY_ASTR,
-  MY_RCBR,
-  MY_UNDS,
-  MY_SCLN,
-  MY_COLN,
-  MY_BKKR, // Name of "EXLM" causes a bug of conflicting to EX().
-  MY_HASH,
-  MY_DLR,
-  MY_PERC,
-  MY_DEL,
 };
 
 const key_string_map_t custom_keys_user = {
   .start_kc = QWERTY,
-  .end_kc = MY_DEL,
+  .end_kc = MY_KANA,
   .key_strings =
     "QWERTY\0"
     "QWERTY_WIN\0"
@@ -108,28 +80,6 @@ const key_string_map_t custom_keys_user = {
     "INFO\0"
     "MY_EISU\0"
     "MY_KANA\0"
-    "MY_CIRC\0"
-    "MY_AT\0"
-    "MY_BSLS\0"
-    "MY_AMPR\0"
-    "MY_QUOT\0"
-    "MY_LPRN\0"
-    "MY_RPRN\0"
-    "MY_EQL\0"
-    "MY_PIPE\0"
-    "MY_GRV\0"
-    "MY_LCBR\0"
-    "MY_PLUS\0"
-    "MY_ASTR\0"
-    "MY_RCBR\0"
-    "MY_UNDS\0"
-    "MY_SCLN\0"
-    "MY_COLN\0"
-    "MY_BKKR\0"
-    "MY_HASH\0"
-    "MY_DLR\0"
-    "MY_PERC\0"
-    "MY_D1EL\0"
 };
 
 const key_override_t rprn_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_0, JP_RPRN);
@@ -252,7 +202,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     CASE_AUTO_HANKAKU(KC_7);
     CASE_AUTO_HANKAKU(KC_8);
     CASE_AUTO_HANKAKU(KC_9);
-    // CASE_AUTO_HANKAKU(MY_DEL, KEY_UPSHIFT(BSPACE));
     CASE_AUTO_HANKAKU(JP_EXLM);
     CASE_AUTO_HANKAKU(JP_AT);
     CASE_AUTO_HANKAKU(JP_HASH);
