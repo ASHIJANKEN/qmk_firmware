@@ -164,9 +164,9 @@ void show_info_oled() {
 
 void tap_without_shift(uint8_t mods, uint16_t keycode) {
   if (mods & MOD_MASK_SHIFT) {
-    unregister_mods(MOD_MASK_SHIFT);
+    unregister_code16(KC_LSFT);
     tap_code16(keycode);
-    register_mods(MOD_MASK_SHIFT);
+    register_code16(KC_LSFT);
   } else {
     tap_code16(keycode);
   }
@@ -256,7 +256,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
     case MY_EISU:
       if (record->event.pressed) {
-        tap_code(KC_LANG2);
+        tap_without_shift(mod_state, KC_LANG2);
         is_kana_user = false;
         is_kana_internal = false;
       }
@@ -272,10 +272,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         if (is_kana_user != is_kana_internal) {
           if (is_kana_user == true) {
-            tap_code(KC_LANG1);
+            tap_without_shift(mod_state, KC_LANG1);
             is_kana_internal = true;
           } else {
-            tap_code(KC_LANG2);
+            tap_without_shift(mod_state, KC_LANG2);
             is_kana_internal = false;
           }
         }
