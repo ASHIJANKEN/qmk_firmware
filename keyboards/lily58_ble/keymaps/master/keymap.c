@@ -12,15 +12,6 @@
 
 extern uint8_t is_master;
 
-#define TAP_WITHOUT_SHIFT(CODE) (shift_pressed ? SEND_STRING(SS_UP(X_LSHIFT) SS_TAP(X_##CODE) SS_DOWN(X_LSHIFT)) : SEND_STRING(SS_TAP(X_##CODE)))
-#define CASE_AUTO_HANKAKU(CODE) \
-case CODE:                                                    \
-  if (record->event.pressed && is_kana_internal == true) {    \
-    TAP_WITHOUT_SHIFT(LANG2);                         \
-    is_kana_internal = false;                                 \
-  }                                                           \
-  return true;
-
 // #define OLED_TIMEOUT 0
 #define WINDOWS_MODE true
 #define MAC_MODE false
@@ -40,7 +31,6 @@ enum custom_keycodes {
   QWERTY_WIN,
   UBUNTU,
   MAC,
-  SHIFT,
   LOWER,
   RAISE,
   ADJUST,
@@ -65,7 +55,6 @@ const key_string_map_t custom_keys_user = {
     "QWERTY_WIN\0"
     "UBUNTU\0"
     "MAC\0"
-    "SHIFT\0"
     "LOWER\0"
     "RAISE\0"
     "ADJUST\0"
@@ -111,7 +100,7 @@ const key_override_t **key_overrides = (const key_override_t *[]){
   NULL
 };
 
-bool shift_pressed = false;
+uint8_t mod_state = 0;
 bool os_mode = false;
 // It means which key user pushed, xKANA or xEISU. User assumes IME is in the mode he chose.
 bool is_kana_user = false;
@@ -173,8 +162,19 @@ void show_info_oled() {
 #endif // OLED_DRIVER_ENABLE
 }
 
+void tap_without_shift(uint8_t mods, uint16_t keycode) {
+  if (mods & MOD_MASK_SHIFT) {
+    unregister_mods(MOD_MASK_SHIFT);
+    tap_code16(keycode);
+    register_mods(MOD_MASK_SHIFT);
+  } else {
+    tap_code16(keycode);
+  }
+}
+
 // Called when a key pressed/released.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  mod_state = get_mods();
   bool continue_process = process_record_user_bmp(keycode, record);
   if (continue_process == false) {
       return false;
@@ -192,41 +192,37 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif // OLED_DRIVER_ENABLE
   }
   switch (keycode) {
-    CASE_AUTO_HANKAKU(KC_0);
-    CASE_AUTO_HANKAKU(KC_1);
-    CASE_AUTO_HANKAKU(KC_2);
-    CASE_AUTO_HANKAKU(KC_3);
-    CASE_AUTO_HANKAKU(KC_4);
-    CASE_AUTO_HANKAKU(KC_5);
-    CASE_AUTO_HANKAKU(KC_6);
-    CASE_AUTO_HANKAKU(KC_7);
-    CASE_AUTO_HANKAKU(KC_8);
-    CASE_AUTO_HANKAKU(KC_9);
-    CASE_AUTO_HANKAKU(JP_EXLM);
-    CASE_AUTO_HANKAKU(JP_AT);
-    CASE_AUTO_HANKAKU(JP_HASH);
-    CASE_AUTO_HANKAKU(JP_DLR);
-    CASE_AUTO_HANKAKU(JP_PERC);
-    CASE_AUTO_HANKAKU(JP_CIRC);
-    CASE_AUTO_HANKAKU(JP_AMPR);
-    CASE_AUTO_HANKAKU(JP_ASTR);
-    CASE_AUTO_HANKAKU(JP_LPRN);
-    CASE_AUTO_HANKAKU(JP_RPRN);
-    CASE_AUTO_HANKAKU(JP_LCBR);
-    CASE_AUTO_HANKAKU(JP_RCBR);
-    CASE_AUTO_HANKAKU(JP_GRV);
-    CASE_AUTO_HANKAKU(JP_YEN);
-    CASE_AUTO_HANKAKU(JP_PIPE);
-    CASE_AUTO_HANKAKU(JP_UNDS);
-    CASE_AUTO_HANKAKU(JP_EQL);
-    CASE_AUTO_HANKAKU(JP_PLUS);
-    CASE_AUTO_HANKAKU(JP_SCLN);
-    CASE_AUTO_HANKAKU(JP_COLN);
-    CASE_AUTO_HANKAKU(JP_QUOT);
+    case KC_1 ... KC_0:
+    case JP_EXLM:
+    case JP_AT:
+    case JP_HASH:
+    case JP_DLR:
+    case JP_PERC:
+    case JP_CIRC:
+    case JP_AMPR:
+    case JP_ASTR:
+    case JP_LPRN:
+    case JP_RPRN:
+    case JP_LCBR:
+    case JP_RCBR:
+    case JP_GRV:
+    case JP_YEN:
+    case JP_PIPE:
+    case JP_UNDS:
+    case JP_EQL:
+    case JP_PLUS:
+    case JP_SCLN:
+    case JP_COLN:
+    case JP_QUOT:
+      if (record->event.pressed && is_kana_internal == true) {
+        tap_without_shift(mod_state, KC_LANG2);
+        is_kana_internal = false;
+      }
+      return true;
     case BT_ID0 ... BT_ID7:
       // The code is based on tmk_core/protocol/nrf/bmp.c
       if (record->event.pressed) {
-        if (shift_pressed) {
+        if (mod_state & MOD_MASK_SHIFT) {
 #ifdef CONSOLE_ENABLE
           uprintf("[lilyble] Delete BT_ID:%d\n", keycode - BT_ID0);
 #endif // CONSOLE_ENABLE
@@ -258,15 +254,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         show_info_oled();
       }
       return false;
-    case SHIFT:
-      if (record->event.pressed) {
-        SEND_STRING(SS_DOWN(X_LSHIFT));
-        shift_pressed = true;
-      } else {
-        SEND_STRING(SS_UP(X_LSHIFT));
-        shift_pressed = false;
-      }
-      return false;
     case MY_EISU:
       if (record->event.pressed) {
         tap_code(KC_LANG2);
@@ -276,7 +263,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
     case MY_KANA:
       if (record->event.pressed) {
-        TAP_WITHOUT_SHIFT(LANG1);
+        tap_without_shift(mod_state, KC_LANG1);
         is_kana_user = true;
         is_kana_internal = true;
       }
