@@ -162,11 +162,15 @@ void show_info_oled() {
 #endif // OLED_DRIVER_ENABLE
 }
 
-void tap_without_shift(uint8_t mods, uint16_t keycode) {
-  if (mods & MOD_MASK_SHIFT) {
-    unregister_code16(KC_LSFT);
+void tap_without_modifier(uint8_t mods, uint16_t keycode) {
+  if (mods & MOD_MASK_CSA) {
+    if (mods & MOD_MASK_SHIFT) unregister_code16(KC_LSFT);
+    if (mods & MOD_MASK_CTRL) unregister_code16(KC_LCTL);
+    if (mods & MOD_MASK_ALT) unregister_code16(KC_LALT);
     tap_code16(keycode);
-    register_code16(KC_LSFT);
+    if (mods & MOD_MASK_SHIFT) register_code16(KC_LSFT);
+    if (mods & MOD_MASK_CTRL) register_code16(KC_LCTL);
+    if (mods & MOD_MASK_ALT) register_code16(KC_LALT);
   } else {
     tap_code16(keycode);
   }
@@ -215,7 +219,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case JP_COLN:
     case JP_QUOT:
       if (record->event.pressed && is_kana_internal == true) {
-        tap_without_shift(mod_state, KC_LANG2);
+        tap_without_modifier(mod_state, KC_LANG2);
         is_kana_internal = false;
       }
       return true;
@@ -256,14 +260,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
     case MY_EISU:
       if (record->event.pressed) {
-        tap_without_shift(mod_state, KC_LANG2);
+        tap_without_modifier(mod_state, KC_LANG2);
         is_kana_user = false;
         is_kana_internal = false;
       }
       return false;
     case MY_KANA:
       if (record->event.pressed) {
-        tap_without_shift(mod_state, KC_LANG1);
+        tap_without_modifier(mod_state, KC_LANG1);
         is_kana_user = true;
         is_kana_internal = true;
       }
@@ -272,10 +276,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         if (is_kana_user != is_kana_internal) {
           if (is_kana_user == true) {
-            tap_without_shift(mod_state, KC_LANG1);
+            tap_without_modifier(mod_state, KC_LANG1);
             is_kana_internal = true;
           } else {
-            tap_without_shift(mod_state, KC_LANG2);
+            tap_without_modifier(mod_state, KC_LANG2);
             is_kana_internal = false;
           }
         }
