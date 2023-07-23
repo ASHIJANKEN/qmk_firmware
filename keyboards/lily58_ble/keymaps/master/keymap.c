@@ -273,6 +273,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
     case KC_A ... KC_Z:
+    case KC_SPC:
       if (record->event.pressed) {
         if (is_kana_user != is_kana_internal) {
           if (is_kana_user == true) {
